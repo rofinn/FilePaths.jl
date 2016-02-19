@@ -27,7 +27,6 @@ cd(abs(parent( Path(string(@__FILE__)) ))) do
         @test string(relative(p, home())) == relpath(string(p), homedir())
 
         s = stat(p)
-        @test string(mode(p)) == "-rw-r--r--"
         @test isfile(p)
         @test isdir(parent(p))
     end
