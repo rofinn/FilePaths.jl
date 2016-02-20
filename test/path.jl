@@ -15,11 +15,17 @@ cd(abs(parent( Path(string(@__FILE__)) ))) do
         @test hasparent(p)
         @test parent(p) == p"../src"
         @test parents(p) == [p"..", p"../src"]
+        @test_throws ErrorException parents(p".")
+
         @test basename(p) == "Paths.jl"
         @test joinpath(parent(p), Path(basename(p))) == p
         @test filename(p) == "Paths"
+
         @test extension(p) == "jl"
+        @test extension(p"../REQUIRE") == ""
         @test extensions(p"foo.tar.gz") == ["tar", "gz"]
+        @test length(extensions(p"../REQUIRE")) == 0
+
         @test exists(p)
         @test !isabs(p)
         @test string(norm(p"../src/../src/Paths.jl")) == normpath("../src/../src/Paths.jl")
@@ -68,27 +74,50 @@ mktmpdir() do d
             mkdir(new_path; recursive=true, exist_ok=true)
 
             other_path = p"car/bar"
-            # @test_throws ErrorException copy(new_path, other_path)
             copy(new_path, other_path; recursive=true)
+            copy(new_path, other_path; exist_ok=true, overwrite=true)
+            @test_throws ErrorException copy(new_path, other_path)
+            @test_throws ErrorException copy(p"badpath", other_path; exist_ok=true, overwrite=true)
             remove(p"car"; recursive=true)
 
-            # @test_throws ErrorException move(new_path, other_path)
             move(new_path, other_path; recursive=true)
+            mkdir(new_path; recursive=true)
+            move(new_path, other_path; exist_ok=true, overwrite=true)
+            @test_throws ErrorException move(new_path, other_path)
+            @test_throws ErrorException move(p"badpath", other_path; exist_ok=true, overwrite=true)
             remove(p"car"; recursive=true)
 
             mkdir(new_path; recursive=true)
 
             symlink(new_path, p"mysymlink")
             symlink(new_path, p"mysymlink"; exist_ok=true, overwrite=true)
+            @test_throws ErrorException symlink(new_path, p"mysymlink")
+            @test_throws ErrorException symlink(p"badpath", p"mysymlink"; exist_ok=true, overwrite=true)
 
             touch(p"newfile")
+            mktmp(d) do f, io
+                println(f)
+                println(io)
+            end
+
+            @unix_only if ENV["USER"] =="root"
+                chown(p"newfile", "nobody", "nogroup"; recursive=true)
+            else
+                @test_throws ErrorException chown(p"newfile", "nobody", "nogroup"; recursive=true)
+            end
+
+            @windows_only @test_throws ErrorException chown(p"newfile", "nobody", "nogroup"; recursive=true)
 
             chmod(p"newfile", user=(READ+WRITE+EXEC), group=(READ+EXEC), other=READ)
             @test string(mode(p"newfile")) == "-rwxr-xr--"
             chmod(p"newfile", "-x")
             @test string(mode(p"newfile")) == "-rw-r--r--"
+            chmod(p"newfile", "+x")
             write(p"newfile", "foobar")
             @test read(p"newfile") == "foobar"
+            chmod(p"newfile", "u=rwx")
+
+            chmod(new_path, mode(p"newfile"); recursive=true)
         end
     end
 end

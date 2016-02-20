@@ -34,6 +34,7 @@ export
     tmpdir,
     mktmp,
     mktmpdir,
+    chown,
     executable,
     readable,
     writable,

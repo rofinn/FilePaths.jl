@@ -324,12 +324,13 @@ end
 
 function chown(path::AbstractPath, user::AbstractString, group::AbstractString; recursive=false)
     @unix_only begin
-        r = ""
+        chown_cmd = ByteString["chown"]
         if recursive
-            r = "-R "
+            push!(chown_cmd, "-R")
         end
+        append!(chown_cmd, ByteString["$(user):$(group)", string(path)])
 
-        run(`chown $(r)$(user):$(group) $path`)
+        run(Cmd(chown_cmd))
     end
 
     @windows_only error("chown is currently not supported on windows.")
@@ -339,11 +340,13 @@ function Base.chmod(path::AbstractPath, mode::Mode; recursive=false)
     chmod_path = string(path)
     chmod_mode = raw(mode)
 
-    if recursive
-        @unix ? run(`chmod -R $(raw(mode)) $path`) : error("Recursive chmod not unsupported on windows")
-    else
-        chmod(chmod_path, chmod_mode)
+    if isdir(path) && recursive
+        for p in glob(path, "*")
+            chmod(chmod_path, chmod_mode; recursive=recursive)
+        end
     end
+
+    chmod(string(path), raw(mode))
 end
 
 function Base.chmod(path::AbstractPath; user::UInt8=0o0, group::UInt8=0o0, other::UInt8=0o0, recursive=false)
