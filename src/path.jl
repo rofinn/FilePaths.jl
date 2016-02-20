@@ -4,12 +4,7 @@ import Glob: glob
 # Generic constructor which will create the appropriate
 # implementation based on the host platform.
 function Path(str::AbstractString)
-    @unix_only begin
-        return PosixPath(str)
-    end
-    @windows_only begin
-        return WindowsPath(str)
-    end
+    return @unix ? PosixPath(str) : WindowsPath(str)
 end
 
 # non-standard string literal
@@ -154,17 +149,19 @@ function glob{T<:AbstractPath}(path::T, pattern)
     matches = glob(pattern, string(path))
 
     return map(
-        i -> joinpath(path, T(i)),
+        i -> T(i),
         matches
     )
 end
 
 function uri(path::AbstractPath)
     if isempty(root(path))
-        error("$path is not an absolute path")
+        error("$(string(path)) is not an absolute path")
     end
 
-    return URI("file://$path")
+    uri_str = "file://$(string(path))"
+
+    return URI(uri_str)
 end
 
 #=
@@ -202,18 +199,7 @@ code in the implementation instances.
 =#
 
 Base.cd(path::AbstractPath) = cd(string(path))
-@unix_only function Base.cd(fn::Function, dir::AbstractPath)
-    fd = ccall(:open,Int32,(Cstring,Int32),:.,0)
-    systemerror(:open, fd == -1)
-    try
-        cd(dir)
-        fn()
-    finally
-        systemerror(:fchdir, ccall(:fchdir,Int32,(Int32,),fd) != 0)
-        systemerror(:close, ccall(:close,Int32,(Int32,),fd) != 0)
-    end
-end
-@windows_only function Base.cd(fn::Function, dir::AbstractPath)
+function Base.cd(fn::Function, dir::AbstractPath)
     old = cwd()
     try
         cd(dir)
@@ -345,9 +331,8 @@ function chown(path::AbstractPath, user::AbstractString, group::AbstractString; 
 
         run(`chown $(r)$(user):$(group) $path`)
     end
-    @windows_only begin
-        error("chown is currently not supported on windows.")
-    end
+
+    @windows_only error("chown is currently not supported on windows.")
 end
 
 function Base.chmod(path::AbstractPath, mode::Mode; recursive=false)
@@ -355,12 +340,7 @@ function Base.chmod(path::AbstractPath, mode::Mode; recursive=false)
     chmod_mode = raw(mode)
 
     if recursive
-        @unix_only begin
-            run(`chmod -R $(raw(mode)) $path`)
-        end
-        @windows_only begin
-            error("Recursive chmod is currently unsupported on windows")
-        end
+        @unix ? run(`chmod -R $(raw(mode)) $path`) : error("Recursive chmod not unsupported on windows")
     else
         chmod(chmod_path, chmod_mode)
     end

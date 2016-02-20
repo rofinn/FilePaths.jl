@@ -25,10 +25,31 @@ cd(abs(parent( Path(string(@__FILE__)) ))) do
         @test string(norm(p"../src/../src/Paths.jl")) == normpath("../src/../src/Paths.jl")
         @test string(abs(p)) == abspath(string(p))
         @test string(relative(p, home())) == relpath(string(p), homedir())
+        @test uri(PosixPath("/foo/bar")) == URI("file:///foo/bar")
+        @test_throws ErrorException uri(p"foo/bar")
+
+        @test p"../src/Paths.jl" in glob(p"../src", "*.jl")
 
         s = stat(p)
+        lstat(p)
+
+        io = IOBuffer()
+        show(io, s)
+        show_str = copy(takebuf_string(io))
+        #@test "device" in show_str
+        #@test "blocks" in show_str
+
+        @test size(p) == stat(p).size
+        @test modified(p) == stat(p).mtime
+        @test created(p) == stat(p).ctime
+
         @test isfile(p)
         @test isdir(parent(p))
+        @test !islink(p)
+        @test !issocket(p)
+        @test !isfifo(p)
+        @test !ischardev(p)
+        @test !isblockdev(p)
     end
 end
 

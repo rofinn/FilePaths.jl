@@ -6,6 +6,8 @@ include(include_path)
 
 using Paths
 
+import URIParser: URI
+
 if VERSION >= v"0.5-"
     using Base.Test
 else
