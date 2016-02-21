@@ -6,8 +6,8 @@ immutable Status
     inode::UInt64
     mode::Mode
     nlink::Int64
-    uid::UInt64
-    gid::UInt64
+    user::User
+    group::Group
     rdev::UInt64
     size::Int64
     blksize::Int64
@@ -21,8 +21,8 @@ immutable Status
             s.inode,
             Mode(s.mode),
             s.nlink,
-            s.uid,
-            s.gid,
+            User(s.uid),
+            Group(s.gid),
             s.rdev,
             s.size,
             s.blksize,
@@ -34,19 +34,19 @@ immutable Status
 end
 
 function Base.show(io::IO, s::Status)
-    output = string("Status(\n",
-        "  device = $(s.device),\n",
-        "  inode = $(s.inode),\n",
-        "  mode = $(s.mode),\n",
-        "  nlink = $(s.nlink),\n",
-        "  uid = $(s.uid),\n",
-        "  gid = $(s.gid),\n",
-        "  rdev = $(s.rdev),\n",
-        "  size = $(s.size) ($(datasize(s.size, style=:gnu))),\n",
-        "  blksize = $(s.blksize) ($(datasize(s.blksize, style=:gnu))),\n",
-        "  blocks = $(s.blocks),\n",
-        "  mtime = $(s.mtime),\n",
+    output = "Status(\n" *
+        "  device = $(s.device),\n" *
+        "  inode = $(s.inode),\n" *
+        "  mode = $(s.mode),\n" *
+        "  nlink = $(s.nlink),\n" *
+        "  uid = $(s.user),\n" *
+        "  gid = $(s.group),\n" *
+        "  rdev = $(s.rdev),\n" *
+        "  size = $(s.size) ($(datasize(s.size, style=:gnu))),\n" *
+        "  blksize = $(s.blksize) ($(datasize(s.blksize, style=:gnu))),\n" *
+        "  blocks = $(s.blocks),\n" *
+        "  mtime = $(s.mtime),\n" *
         "  ctime = $(s.ctime),\n)"
-    )
+
     print(io, output)
 end

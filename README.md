@@ -141,10 +141,6 @@ N/A | read
 N/A | write
 
 ## TODO:
-* isexecutable
-* iswritable
-* isreadable
-* ismount
 * cross platform chmod and chown
 
 

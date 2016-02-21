@@ -12,6 +12,13 @@
        pw_expire::Cint
        pw_fields::Cint
     end
+
+    immutable Cgroup
+        gr_name::Cstring
+        gr_passwd::Cstring
+        gr_gid::Cint
+        gr_mem::Ptr{Cstring}
+    end
 end
 
 @linux_only begin
@@ -23,6 +30,12 @@ end
        pw_gecos::Cstring
        pw_dir::Cstring
        pw_shell::Cstring
+    end
+
+    immutable Cgroup
+        gr_name::Cstring
+        gr_gid::Cint
+        gr_mem::Ptr{Cstring}
     end
 end
 
@@ -46,6 +59,10 @@ immutable User
     end
 end
 
+function Base.show(io::IO, user::User)
+    print(io, "$(user.uid) ($(user.name))")
+end
+
 function User(name::ASCIIString)
     ps = ccall((:getpwnam, "libc"), Ptr{Cpasswd}, (Ptr{UInt8},), name)
     User(ps)
@@ -60,3 +77,42 @@ function User()
     uid = ccall((:geteuid, "libc"), Cint, ())
     User(UInt64(uid))
 end
+
+immutable Group
+    name::ASCIIString
+    gid::UInt64
+    members::Array{ASCIIString}
+
+    function Group(group::Ptr{Cgroup})
+        gr = unsafe_load(group)
+
+        new(
+            pointer_to_string(gr.gr_name),
+            UInt64(gr.gr_gid),
+            ASCIIString[
+                pointer_to_string(m)
+                for m in pointer_to_array(gr.gr_mem, 1)
+            ]
+        )
+    end
+end
+
+function Base.show(io::IO, group::Group)
+    print(io, "$(group.gid) ($(group.name))")
+end
+
+function Group(name::ASCIIString)
+    ps = ccall((:getgrnam, "libc"), Ptr{Cgroup}, (Ptr{UInt8},), name)
+    Group(ps)
+end
+
+function Group(gid::UInt64)
+    gr = ccall((:getgrgid, "libc"), Ptr{Cgroup}, (UInt64,), gid)
+    Group(gr)
+end
+
+function Group()
+    gid = ccall((:getegid, "libc"), Cint, ())
+    Group(UInt64(gid))
+end
+

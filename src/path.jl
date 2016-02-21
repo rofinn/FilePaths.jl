@@ -187,8 +187,8 @@ function Base.isexecutable(path::AbstractPath)
     usr = User()
 
     return isexecutable(s.mode, :ALL) || isexecutable(s.mode, :OTHER) ||
-        ( usr.uid == s.uid && isexecutable(s.mode, :USER) ) ||
-        ( usr.gid == s.gid && isexecutable(s.mode, :GROUP) )
+        ( usr.uid == s.user.uid && isexecutable(s.mode, :USER) ) ||
+        ( usr.gid == s.group.gid && isexecutable(s.mode, :GROUP) )
 end
 
 function Base.iswritable(path::AbstractPath)
@@ -196,8 +196,8 @@ function Base.iswritable(path::AbstractPath)
     usr = User()
 
     return iswritable(s.mode, :ALL) || iswritable(s.mode, :OTHER) ||
-        ( usr.uid == s.uid && iswritable(s.mode, :USER) ) ||
-        ( usr.gid == s.gid && iswritable(s.mode, :GROUP) )
+        ( usr.uid == s.user.uid && iswritable(s.mode, :USER) ) ||
+        ( usr.gid == s.group.gid && iswritable(s.mode, :GROUP) )
 end
 
 function Base.isreadable(path::AbstractPath)
@@ -205,8 +205,8 @@ function Base.isreadable(path::AbstractPath)
     usr = User()
 
     return isreadable(s.mode, :ALL) || isreadable(s.mode, :OTHER) ||
-        ( usr.uid == s.uid && isreadable(s.mode, :USER) ) ||
-        ( usr.gid == s.gid && isreadable(s.mode, :GROUP) )
+        ( usr.uid == s.user.uid && isreadable(s.mode, :USER) ) ||
+        ( usr.gid == s.group.gid && isreadable(s.mode, :GROUP) )
 end
 
 function Base.ismount(path::AbstractPath)
@@ -253,10 +253,10 @@ function Base.mkdir(path::AbstractPath; mode=0o777, recursive=false, exist_ok=fa
         elseif hasparent(path) && !exists(parent(path)) && recursive
             mkdir(parent(path); mode=mode, recursive=recursive, exist_ok=exist_ok)
         else
-            error(string(
-                "The parent of $path does not exist. ",
+            error(
+                "The parent of $path does not exist. " *
                 "Pass recursive=true to create it."
-            ))
+            )
         end
     end
 end
