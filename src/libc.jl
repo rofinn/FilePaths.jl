@@ -1,42 +1,32 @@
-@osx_only begin
-    immutable Cpasswd
-       pw_name::Cstring
-       pw_passwd::Cstring
-       pw_uid::Cint
-       pw_gid::Cint
-       pw_change::Cint
-       pw_class::Cstring
-       pw_gecos::Cstring
-       pw_dir::Cstring
-       pw_shell::Cstring
-       pw_expire::Cint
-       pw_fields::Cint
-    end
-
-    immutable Cgroup
-        gr_name::Cstring
-        gr_passwd::Cstring
-        gr_gid::Cint
-        gr_mem::Ptr{Cstring}
-    end
+@osx_only immutable Cpasswd
+   pw_name::Cstring
+   pw_passwd::Cstring
+   pw_uid::Cint
+   pw_gid::Cint
+   pw_change::Cint
+   pw_class::Cstring
+   pw_gecos::Cstring
+   pw_dir::Cstring
+   pw_shell::Cstring
+   pw_expire::Cint
+   pw_fields::Cint
 end
 
-@linux_only begin
-    immutable Cpasswd
-       pw_name::Cstring
-       pw_passwd::Cstring
-       pw_uid::Cint
-       pw_gid::Cint
-       pw_gecos::Cstring
-       pw_dir::Cstring
-       pw_shell::Cstring
-    end
+@linux_only immutable Cpasswd
+   pw_name::Cstring
+   pw_passwd::Cstring
+   pw_uid::Cint
+   pw_gid::Cint
+   pw_gecos::Cstring
+   pw_dir::Cstring
+   pw_shell::Cstring
+end
 
-    immutable Cgroup
-        gr_name::Cstring
-        gr_gid::Cint
-        gr_mem::Ptr{Cstring}
-    end
+@unix_only immutable Cgroup
+    gr_name::Cstring
+    gr_passwd::Cstring
+    gr_gid::Cint
+    gr_mem::Ptr{Cstring}
 end
 
 immutable User
