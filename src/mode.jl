@@ -52,6 +52,48 @@ executable(usr_grps::Symbol...) = Mode(EXEC, usr_grps...)
 readable(usr_grps::Symbol...) = Mode(READ, usr_grps...)
 writable(usr_grps::Symbol...) = Mode(WRITE, usr_grps...)
 
+function Base.isexecutable(mode::Mode, usr_grp::Symbol)
+    mask = S_IXOTH | S_IXGRP | S_IXUSR
+
+    if usr_grp == :OTHER
+        mask = S_IXOTH
+    elseif usr_grp == :GROUP
+        mask = S_IXGRP
+    elseif usr_grp == :USER
+        mask = S_IXUSR
+    end
+
+    return mode.m & mask == mask
+end
+
+function Base.iswritable(mode::Mode, usr_grp::Symbol)
+    mask = S_IWOTH | S_IWGRP | S_IWUSR
+
+    if usr_grp == :OTHER
+        mask = S_IWOTH
+    elseif usr_grp == :GROUP
+        mask = S_IWGRP
+    elseif usr_grp == :USER
+        mask = S_IWUSR
+    end
+
+    return mode.m & mask == mask
+end
+
+function Base.isreadable(mode::Mode, usr_grp::Symbol)
+    mask = S_IROTH | S_IRGRP | S_IRUSR
+
+    if usr_grp == :OTHER
+        mask = S_IROTH
+    elseif usr_grp == :GROUP
+        mask = S_IRGRP
+    elseif usr_grp == :USER
+        mask = S_IRUSR
+    end
+
+    return mode.m & mask == mask
+end
+
 Base.oct(mode::Mode) = oct(mode.m)
 raw(mode::Mode) = mode.m
 

@@ -110,7 +110,13 @@ mktmpdir() do d
 
             chmod(p"newfile", user=(READ+WRITE+EXEC), group=(READ+EXEC), other=READ)
             @test string(mode(p"newfile")) == "-rwxr-xr--"
+            @test isexecutable(p"newfile")
+            @test iswritable(p"newfile")
+            @test isreadable(p"newfile")
+
             chmod(p"newfile", "-x")
+            @test !isexecutable(p"newfile")
+
             @test string(mode(p"newfile")) == "-rw-r--r--"
             chmod(p"newfile", "+x")
             write(p"newfile", "foobar")
@@ -118,6 +124,8 @@ mktmpdir() do d
             chmod(p"newfile", "u=rwx")
 
             chmod(new_path, mode(p"newfile"); recursive=true)
+
+
         end
     end
 end

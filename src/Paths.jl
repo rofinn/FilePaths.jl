@@ -56,6 +56,7 @@ parts(path::AbstractPath) = error("`parts` not implemented.")
 root(path::AbstractPath) = error("`root` not implemented.")
 
 include("constants.jl")
+include("libc.jl")
 include("mode.jl")
 include("status.jl")
 include("posix.jl")

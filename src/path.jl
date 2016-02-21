@@ -182,10 +182,45 @@ Base.isfifo(path::AbstractPath) = issocket(mode(path))
 Base.ischardev(path::AbstractPath) = ischardev(mode(path))
 Base.isblockdev(path::AbstractPath) = isblockdev(mode(path))
 
-# isexecutable
-# iswritable
-# isreadable
-# ismount
+function Base.isexecutable(path::AbstractPath)
+    s = stat(path)
+    usr = User()
+
+    return isexecutable(s.mode, :ALL) || isexecutable(s.mode, :OTHER) ||
+        ( usr.uid == s.uid && isexecutable(s.mode, :USER) ) ||
+        ( usr.gid == s.gid && isexecutable(s.mode, :GROUP) )
+end
+
+function Base.iswritable(path::AbstractPath)
+    s = stat(path)
+    usr = User()
+
+    return iswritable(s.mode, :ALL) || iswritable(s.mode, :OTHER) ||
+        ( usr.uid == s.uid && iswritable(s.mode, :USER) ) ||
+        ( usr.gid == s.gid && iswritable(s.mode, :GROUP) )
+end
+
+function Base.isreadable(path::AbstractPath)
+    s = stat(path)
+    usr = User()
+
+    return isreadable(s.mode, :ALL) || isreadable(s.mode, :OTHER) ||
+        ( usr.uid == s.uid && isreadable(s.mode, :USER) ) ||
+        ( usr.gid == s.gid && isreadable(s.mode, :GROUP) )
+end
+
+function Base.ismount(path::AbstractPath)
+    isdir(path) || return false
+    s1 = lstat(path)
+    # Symbolic links cannot be mount points
+    islink(s1) && return false
+    s2 = lstat(parent(path))
+    # If a directory and its parent are on different devices,  then the
+    # directory must be a mount point
+    (s1.device != s2.device) && return true
+    (s1.inode == s2.inode) && return true
+    false
+end
 
 #=
 Path Operations

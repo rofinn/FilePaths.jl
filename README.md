@@ -116,10 +116,10 @@ issocket | issocket
 isfifo | isfifo
 ischardev | ischardev
 isblockdev | isblockdev
-isexecutable | N/A (TODO)
-iswritable | N/A (TODO)
-isreadable | N/A (TODO)
-ismount | N/A (TODO)
+isexecutable (deprecated) | isexecutable
+iswritable (deprecated) | iswritabe
+isreadable (deprecated) | isreadable
+ismount | ismount
 isabspath | isabs
 N/A | drive
 N/A | root

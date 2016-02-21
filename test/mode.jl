@@ -14,6 +14,21 @@
     @test string(r) == "-r--r-----"
     @test string(w) == "--w-------"
 
+    @test isexecutable(x, :USER)
+    @test isexecutable(x, :GROUP)
+    @test isexecutable(x, :OTHER)
+    @test isexecutable(x, :ALL)
+
+    @test iswritable(w, :USER)
+    @test !iswritable(w, :GROUP)
+    @test !iswritable(w, :OTHER)
+    @test !iswritable(w, :ALL)
+
+    @test isreadable(r, :USER)
+    @test isreadable(r, :GROUP)
+    @test !isreadable(r, :OTHER)
+    @test !isreadable(r, :ALL)
+
     @test x + r + w == m
 
     @test string(m - x) == "-rw-r-----"
