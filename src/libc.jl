@@ -26,7 +26,6 @@ end
     gr_name::Cstring
     gr_passwd::Cstring
     gr_gid::Cint
-    gr_mem::Ptr{Cstring}
 end
 
 immutable User
@@ -71,18 +70,13 @@ end
 immutable Group
     name::ASCIIString
     gid::UInt64
-    members::Array{ASCIIString}
 
     function Group(group::Ptr{Cgroup})
         gr = unsafe_load(group)
 
         new(
             pointer_to_string(gr.gr_name),
-            UInt64(gr.gr_gid),
-            ASCIIString[
-                pointer_to_string(m)
-                for m in pointer_to_array(gr.gr_mem, 1)
-            ]
+            UInt64(gr.gr_gid)
         )
     end
 end
