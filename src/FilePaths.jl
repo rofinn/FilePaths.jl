@@ -1,4 +1,4 @@
-module Paths
+module FilePaths
 
 import Base: ==
 export

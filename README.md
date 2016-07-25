@@ -1,32 +1,32 @@
-# Paths.jl
+# FIlePaths.jl
 
-[![Build Status](https://travis-ci.org/Rory-Finnegan/Paths.jl.svg?branch=master)](https://travis-ci.org/Rory-Finnegan/Paths.jl)
-[![codecov.io](https://codecov.io/github/Rory-Finnegan/Paths.jl/coverage.svg?branch=master)](https://codecov.io/github/Rory-Finnegan/Paths.jl?branch=master)
+[![Build Status](https://travis-ci.org/Rory-Finnegan/FilePaths.jl.svg?branch=master)](https://travis-ci.org/Rory-Finnegan/FilePaths.jl)
+[![codecov.io](https://codecov.io/github/Rory-Finnegan/FilePaths.jl/coverage.svg?branch=master)](https://codecov.io/github/Rory-Finnegan/FilePaths.jl?branch=master)
 
-Paths.jl provides a type based approach to working with filesystem paths in julia.
+FilePaths.jl provides a type based approach to working with filesystem paths in julia.
 
 ## Intallation:
-Paths.jl isn't registered, so you'll need to use `Pkg.clone` to install it.
+FilePaths.jl isn't registered, so you'll need to use `Pkg.clone` to install it.
 ```
-julia> Pkg.clone("https://github.com/Rory-Finnegan/Paths.jl")
+julia> Pkg.clone("https://github.com/Rory-Finnegan/FilePaths.jl")
 ```
 
 ## Usage:
 ```
-julia> using Paths
+julia> using FilePaths
 ```
 
-The first important difference about working with paths in Paths.jl is that a path is an immutable list (Tuple) of strings, rather than simple a string.
+The first important difference about working with paths in FilePaths.jl is that a path is an immutable list (Tuple) of strings, rather than simple a string.
 
 Path creation:
 ```
-julia> Path("~/repos/Paths.jl/")
-Paths.PosixPath(("~","repos","Paths.jl",""))
+julia> Path("~/repos/FilePaths.jl/")
+Paths.PosixPath(("~","repos","FilePaths.jl",""))
 ```
 or
 ```
-julia> p"~/repos/Paths.jl/"
-Paths.PosixPath(("~","repos","Paths.jl",""))
+julia> p"~/repos/FilePaths.jl/"
+Paths.PosixPath(("~","repos","FilePaths.jl",""))
 ```
 
 Human readable file status info:
@@ -86,9 +86,9 @@ julia> read(p"testfile")
 "foobar"
 ```
 
-All the standard methods for working with paths in base julia exist in the Paths.jl. The following describes the rough mapping of method names. Use `?` at the REPL to get the documentation and arguments as they may be different than the base implementations.
+All the standard methods for working with paths in base julia exist in the FilePaths.jl. The following describes the rough mapping of method names. Use `?` at the REPL to get the documentation and arguments as they may be different than the base implementations.
 
-Base | Paths.jl
+Base | FilePaths.jl
 --- | ---
 pwd() | cwd()
 homedir() | home()

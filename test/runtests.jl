@@ -1,10 +1,10 @@
 include_path = joinpath(
     abspath(dirname(dirname(@__FILE__))),
-    "src/Paths.jl"
+    "src/FilePaths.jl"
 )
 include(include_path)
 
-using Paths
+using FilePaths
 
 import URIParser: URI
 

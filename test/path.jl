@@ -1,25 +1,25 @@
 
 cd(abs(parent( Path(string(@__FILE__)) ))) do
     @testset "Simple Path Usage" begin
-        reg = "../src/Paths.jl"
+        reg = "../src/FilePaths.jl"
         @test ispath(reg)
 
         p = Path(reg)
 
-        @test p == p"../src/Paths.jl"
+        @test p == p"../src/FilePaths.jl"
         @test string(p) == reg
         @test string(cwd()) == pwd()
         @test string(home()) == homedir()
 
-        @test parts(p) == ("..", "src", "Paths.jl")
+        @test parts(p) == ("..", "src", "FilePaths.jl")
         @test hasparent(p)
         @test parent(p) == p"../src"
         @test parents(p) == [p"..", p"../src"]
         @test_throws ErrorException parents(p".")
 
-        @test basename(p) == "Paths.jl"
+        @test basename(p) == "FilePaths.jl"
         @test joinpath(parent(p), Path(basename(p))) == p
-        @test filename(p) == "Paths"
+        @test filename(p) == "FilePaths"
 
         @test extension(p) == "jl"
         @test extension(p"../REQUIRE") == ""
@@ -28,13 +28,13 @@ cd(abs(parent( Path(string(@__FILE__)) ))) do
 
         @test exists(p)
         @test !isabs(p)
-        @test string(norm(p"../src/../src/Paths.jl")) == normpath("../src/../src/Paths.jl")
+        @test string(norm(p"../src/../src/FilePaths.jl")) == normpath("../src/../src/FilePaths.jl")
         @test string(abs(p)) == abspath(string(p))
         @test string(relative(p, home())) == relpath(string(p), homedir())
         @test uri(PosixPath("/foo/bar")) == URI("file:///foo/bar")
         @test_throws ErrorException uri(p"foo/bar")
 
-        @test p"../src/Paths.jl" in glob(p"../src", "*.jl")
+        @test p"../src/FilePaths.jl" in glob(p"../src", "*.jl")
 
         s = stat(p)
         lstat(p)
