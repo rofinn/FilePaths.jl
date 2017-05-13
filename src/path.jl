@@ -4,7 +4,11 @@ import Glob: glob
 # Generic constructor which will create the appropriate
 # implementation based on the host platform.
 function Path(str::AbstractString)
-    return @unix ? PosixPath(str) : WindowsPath(str)
+    @static if is_unix()
+        PosixPath(str)
+    else
+        WindowsPath(str)
+    end
 end
 
 # non-standard string literal
@@ -36,7 +40,7 @@ function parents{T<:AbstractPath}(path::T)
 end
 
 function Base.joinpath{T<:AbstractPath}(pieces::T...)
-    all_parts = ASCIIString[]
+    all_parts = String[]
 
     for p in pieces
         push!(all_parts, parts(p)...)
@@ -79,7 +83,7 @@ Base.real(path::AbstractPath) = Path(realpath(string(path)))
 
 function Base.norm{T<:AbstractPath}(path::T)
     p = parts(path)
-    result = ASCIIString[]
+    result = String[]
     rem = length(p)
     count = 0
     del = 0
@@ -145,13 +149,9 @@ function relative{T<:AbstractPath}(path::T, start::T=T("."))
     return isempty(relpath_) ? T(curdir) : T(relpath_)
 end
 
-function glob{T<:AbstractPath}(path::T, pattern)
+function glob{T<:AbstractPath}(path::T, pattern::AbstractString)
     matches = glob(pattern, string(path))
-
-    return map(
-        i -> T(i),
-        matches
-    )
+    map(T, matches)
 end
 
 function uri(path::AbstractPath)
@@ -182,7 +182,7 @@ Base.isfifo(path::AbstractPath) = issocket(mode(path))
 Base.ischardev(path::AbstractPath) = ischardev(mode(path))
 Base.isblockdev(path::AbstractPath) = isblockdev(mode(path))
 
-function Base.isexecutable(path::AbstractPath)
+function isexecutable(path::AbstractPath)
     s = stat(path)
     usr = User()
 
@@ -357,18 +357,18 @@ function mktmpdir(fn::Function, parent=tmpdir())
     end
 end
 
-function chown(path::AbstractPath, user::AbstractString, group::AbstractString; recursive=false)
-    @unix_only begin
-        chown_cmd = ByteString["chown"]
+function Base.chown(path::AbstractPath, user::AbstractString, group::AbstractString; recursive=false)
+    @static if is_unix()
+        chown_cmd = String["chown"]
         if recursive
             push!(chown_cmd, "-R")
         end
-        append!(chown_cmd, ByteString["$(user):$(group)", string(path)])
+        append!(chown_cmd, String["$(user):$(group)", string(path)])
 
         run(Cmd(chown_cmd))
+    else
+        error("chown is currently not supported on windows.")
     end
-
-    @windows_only error("chown is currently not supported on windows.")
 end
 
 function Base.chmod(path::AbstractPath, mode::Mode; recursive=false)
@@ -439,11 +439,10 @@ function Base.chmod(path::AbstractPath, symbolic_mode::AbstractString; recursive
     end
 end
 
-Base.read(path::AbstractPath) = open(readall, string(path))
+Base.read(path::AbstractPath) = open(readstring, string(path))
 
 function Base.write(path::AbstractPath, content::AbstractString)
     open(string(path), "w") do f
         write(f, content)
     end
 end
-

@@ -3,7 +3,7 @@ immutable PosixPath <: AbstractPath
 end
 
 function PosixPath(str::AbstractString)
-    str = ASCIIString(str)
+    str = String(str)
 
     if isempty(str)
         return PosixPath(tuple("."))
@@ -52,5 +52,3 @@ function expanduser(path::PosixPath)
 
     return path
 end
-
-

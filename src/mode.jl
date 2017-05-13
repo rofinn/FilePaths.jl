@@ -45,14 +45,14 @@ end
 
 Base.show(io::IO, mode::Mode) = print(io, string(mode))
 
-Base.(:-)(a::Mode, b::Mode) = Mode(a.m & ~b.m)
-Base.(:+)(a::Mode, b::Mode) = Mode(a.m | b.m)
+Base.:-(a::Mode, b::Mode) = Mode(a.m & ~b.m)
+Base.:+(a::Mode, b::Mode) = Mode(a.m | b.m)
 
 executable(usr_grps::Symbol...) = Mode(EXEC, usr_grps...)
 readable(usr_grps::Symbol...) = Mode(READ, usr_grps...)
 writable(usr_grps::Symbol...) = Mode(WRITE, usr_grps...)
 
-function Base.isexecutable(mode::Mode, usr_grp::Symbol)
+function isexecutable(mode::Mode, usr_grp::Symbol)
     mask = S_IXOTH | S_IXGRP | S_IXUSR
 
     if usr_grp == :OTHER
@@ -150,4 +150,3 @@ Return the portion of the file's mode that describes the
 file type.
 """
 _meta(mode) = mode & 0o170000
-

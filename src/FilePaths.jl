@@ -1,5 +1,7 @@
 module FilePaths
 
+using Compat
+
 import Base: ==
 export
     # Types
@@ -48,7 +50,13 @@ export
     WRITE,
     EXEC
 
-abstract AbstractPath
+@static if VERSION < v"0.6.0-dev.2514"
+    import Base: isexecutable
+else
+    export isexecutable
+end
+
+@compat abstract type AbstractPath end
 
 # The following should be implemented in the concrete types
 Base.string(path::AbstractPath) = error("`string not implemented")
