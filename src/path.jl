@@ -149,13 +149,9 @@ function relative{T<:AbstractPath}(path::T, start::T=T("."))
     return isempty(relpath_) ? T(curdir) : T(relpath_)
 end
 
-function glob{T<:AbstractPath}(path::T, pattern)
+function glob{T<:AbstractPath}(path::T, pattern::AbstractString)
     matches = glob(pattern, string(path))
-
-    return map(
-        i -> T(i),
-        matches
-    )
+    map(T, matches)
 end
 
 function uri(path::AbstractPath)
@@ -186,7 +182,7 @@ Base.isfifo(path::AbstractPath) = issocket(mode(path))
 Base.ischardev(path::AbstractPath) = ischardev(mode(path))
 Base.isblockdev(path::AbstractPath) = isblockdev(mode(path))
 
-function Base.isexecutable(path::AbstractPath)
+function isexecutable(path::AbstractPath)
     s = stat(path)
     usr = User()
 

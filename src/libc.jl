@@ -41,11 +41,11 @@ immutable User
         ps = unsafe_load(passwd)
 
         new(
-            unsafe_wrap(String, ps.pw_name),
+            unsafe_string(ps.pw_name),
             UInt64(ps.pw_uid),
             UInt64(ps.pw_gid),
-            unsafe_wrap(String, ps.pw_dir),
-            unsafe_wrap(String, ps.pw_shell)
+            unsafe_string(ps.pw_dir),
+            unsafe_string(ps.pw_shell)
         )
     end
 end
@@ -77,7 +77,7 @@ immutable Group
         gr = unsafe_load(group)
 
         new(
-            unsafe_wrap(String, gr.gr_name),
+            unsafe_string(gr.gr_name),
             UInt64(gr.gr_gid)
         )
     end
