@@ -1,14 +1,14 @@
 # FIlePaths.jl
 
-[![Build Status](https://travis-ci.org/Rory-Finnegan/FilePaths.jl.svg?branch=master)](https://travis-ci.org/Rory-Finnegan/FilePaths.jl)
-[![codecov.io](https://codecov.io/github/Rory-Finnegan/FilePaths.jl/coverage.svg?branch=master)](https://codecov.io/github/Rory-Finnegan/FilePaths.jl?branch=master)
+[![Build Status](https://travis-ci.org/rofinn/FilePaths.jl.svg?branch=master)](https://travis-ci.org/rofinn/FilePaths.jl)
+[![codecov.io](https://codecov.io/github/rofinn/FilePaths.jl/coverage.svg?branch=master)](https://codecov.io/rofinn/Rory-Finnegan/FilePaths.jl?branch=master)
 
 FilePaths.jl provides a type based approach to working with filesystem paths in julia.
 
 ## Intallation:
 FilePaths.jl isn't registered, so you'll need to use `Pkg.clone` to install it.
 ```
-julia> Pkg.clone("https://github.com/Rory-Finnegan/FilePaths.jl")
+julia> Pkg.clone("https://github.com/rofinn/FilePaths.jl")
 ```
 
 ## Usage:
