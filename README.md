@@ -7,30 +7,30 @@ FilePaths.jl provides a type based approach to working with filesystem paths in 
 
 ## Intallation:
 FilePaths.jl isn't registered, so you'll need to use `Pkg.clone` to install it.
-```
+```julia
 julia> Pkg.clone("https://github.com/rofinn/FilePaths.jl")
 ```
 
 ## Usage:
-```
+```julia
 julia> using FilePaths
 ```
 
 The first important difference about working with paths in FilePaths.jl is that a path is an immutable list (Tuple) of strings, rather than simple a string.
 
 Path creation:
-```
+```julia
 julia> Path("~/repos/FilePaths.jl/")
 Paths.PosixPath(("~","repos","FilePaths.jl",""))
 ```
 or
-```
+```julia
 julia> p"~/repos/FilePaths.jl/"
 Paths.PosixPath(("~","repos","FilePaths.jl",""))
 ```
 
 Human readable file status info:
-```
+```julia
 julia> stat(p"README.md")
 Status(
   device = 16777220,
@@ -49,7 +49,7 @@ Status(
 ```
 
 Working with permissions:
-```
+```julia
 julia> m = mode(p"README.md")
 -rw-r--r--
 
@@ -78,7 +78,7 @@ julia> mode(p"README.md")
 
 
 Reading and writing directly to file paths:
-```
+```julia
 julia> write(p"testfile", "foobar")
 6
 
