@@ -1,6 +1,6 @@
 immutable WindowsPath <: AbstractPath
     parts::Tuple
-    drive::ASCIIString
+    drive::String
 end
 
 function WindowsPath(str::AbstractString)

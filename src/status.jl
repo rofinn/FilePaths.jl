@@ -1,6 +1,8 @@
 using Base.Dates
 using Humanize
 
+import Base.Filesystem: StatStruct
+
 immutable Status
     device::UInt64
     inode::UInt64

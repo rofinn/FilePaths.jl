@@ -1,49 +1,51 @@
-@osx_only immutable Cpasswd
-   pw_name::Cstring
-   pw_passwd::Cstring
-   pw_uid::Cint
-   pw_gid::Cint
-   pw_change::Cint
-   pw_class::Cstring
-   pw_gecos::Cstring
-   pw_dir::Cstring
-   pw_shell::Cstring
-   pw_expire::Cint
-   pw_fields::Cint
+@static if is_apple()
+    immutable Cpasswd
+        pw_name::Cstring
+        pw_passwd::Cstring
+        pw_uid::Cint
+        pw_gid::Cint
+        pw_change::Cint
+        pw_class::Cstring
+        pw_gecos::Cstring
+        pw_dir::Cstring
+        pw_shell::Cstring
+        pw_expire::Cint
+        pw_fields::Cint
+    end
+elseif is_linux()
+    immutable Cpasswd
+       pw_name::Cstring
+       pw_passwd::Cstring
+       pw_uid::Cint
+       pw_gid::Cint
+       pw_gecos::Cstring
+       pw_dir::Cstring
+       pw_shell::Cstring
+    end
 end
 
-@linux_only immutable Cpasswd
-   pw_name::Cstring
-   pw_passwd::Cstring
-   pw_uid::Cint
-   pw_gid::Cint
-   pw_gecos::Cstring
-   pw_dir::Cstring
-   pw_shell::Cstring
-end
-
-@unix_only immutable Cgroup
+immutable Cgroup
     gr_name::Cstring
     gr_passwd::Cstring
     gr_gid::Cint
 end
 
 immutable User
-    name::ASCIIString
+    name::String
     uid::UInt64
     gid::UInt64
-    dir::ASCIIString
-    shell::ASCIIString
+    dir::String
+    shell::String
 
     function User(passwd::Ptr{Cpasswd})
         ps = unsafe_load(passwd)
 
         new(
-            pointer_to_string(ps.pw_name),
+            unsafe_wrap(String, ps.pw_name),
             UInt64(ps.pw_uid),
             UInt64(ps.pw_gid),
-            pointer_to_string(ps.pw_dir),
-            pointer_to_string(ps.pw_shell)
+            unsafe_wrap(String, ps.pw_dir),
+            unsafe_wrap(String, ps.pw_shell)
         )
     end
 end
@@ -52,7 +54,7 @@ function Base.show(io::IO, user::User)
     print(io, "$(user.uid) ($(user.name))")
 end
 
-function User(name::ASCIIString)
+function User(name::String)
     ps = ccall((:getpwnam, "libc"), Ptr{Cpasswd}, (Ptr{UInt8},), name)
     User(ps)
 end
@@ -68,14 +70,14 @@ function User()
 end
 
 immutable Group
-    name::ASCIIString
+    name::String
     gid::UInt64
 
     function Group(group::Ptr{Cgroup})
         gr = unsafe_load(group)
 
         new(
-            pointer_to_string(gr.gr_name),
+            unsafe_wrap(String, gr.gr_name),
             UInt64(gr.gr_gid)
         )
     end
@@ -85,7 +87,7 @@ function Base.show(io::IO, group::Group)
     print(io, "$(group.gid) ($(group.name))")
 end
 
-function Group(name::ASCIIString)
+function Group(name::String)
     ps = ccall((:getgrnam, "libc"), Ptr{Cgroup}, (Ptr{UInt8},), name)
     Group(ps)
 end
@@ -99,4 +101,3 @@ function Group()
     gid = ccall((:getegid, "libc"), Cint, ())
     Group(UInt64(gid))
 end
-

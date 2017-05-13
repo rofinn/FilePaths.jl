@@ -39,9 +39,7 @@ cd(abs(parent( Path(string(@__FILE__)) ))) do
         s = stat(p)
         lstat(p)
 
-        io = IOBuffer()
-        show(io, s)
-        show_str = copy(takebuf_string(io))
+        show_str = sprint(show, s)
         #@test "device" in show_str
         #@test "blocks" in show_str
 
@@ -100,13 +98,15 @@ mktmpdir() do d
                 println(io)
             end
 
-            @unix_only if ENV["USER"] =="root"
-                chown(p"newfile", "nobody", "nogroup"; recursive=true)
+            @static if is_unix()
+                if ENV["USER"] =="root"
+                    chown(p"newfile", "nobody", "nogroup"; recursive=true)
+                else
+                    @test_throws ErrorException chown(p"newfile", "nobody", "nogroup"; recursive=true)
+                end
             else
                 @test_throws ErrorException chown(p"newfile", "nobody", "nogroup"; recursive=true)
             end
-
-            @windows_only @test_throws ErrorException chown(p"newfile", "nobody", "nogroup"; recursive=true)
 
             chmod(p"newfile", user=(READ+WRITE+EXEC), group=(READ+EXEC), other=READ)
             @test string(mode(p"newfile")) == "-rwxr-xr--"
@@ -124,8 +124,6 @@ mktmpdir() do d
             chmod(p"newfile", "u=rwx")
 
             chmod(new_path, mode(p"newfile"); recursive=true)
-
-
         end
     end
 end
