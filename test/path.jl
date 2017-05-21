@@ -99,10 +99,12 @@ mktmpdir() do d
             end
 
             @static if is_unix()
-                if ENV["USER"] =="root"
-                    chown(p"newfile", "nobody", "nogroup"; recursive=true)
-                else
-                    @test_throws ErrorException chown(p"newfile", "nobody", "nogroup"; recursive=true)
+                if haskey(ENV, "USER")
+                    if ENV["USER"] == "root"
+                        chown(p"newfile", "nobody", "nogroup"; recursive=true)
+                    else
+                        @test_throws ErrorException chown(p"newfile", "nobody", "nogroup"; recursive=true)
+                    end
                 end
             else
                 @test_throws ErrorException chown(p"newfile", "nobody", "nogroup"; recursive=true)
