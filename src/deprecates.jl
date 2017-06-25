@@ -14,7 +14,7 @@ import Base:
     mv,
     rm
 
-@deprecate joinpath(pieces::Union{AbstractPath, AbstractString}...) join(pieces...)
+@deprecate joinpath(root::AbstractPath, pieces::Union{AbstractPath, AbstractString}...) join(root, pieces...)
 @deprecate dirname(path::AbstractPath) parent(path)
 @deprecate ispath(path::AbstractPath) exists(path)
 @deprecate realpath(path::AbstractPath) real(path)

@@ -85,7 +85,7 @@ function parents{T<:AbstractPath}(path::T)
 end
 
 """
-    join(pieces::Union{AbstractPath, AbstractString}) -> AbstractPath
+    join(root::AbstractPath, pieces::Union{AbstractPath, AbstractString}...) -> AbstractPath
 
 Joins path components into a full path.
 
@@ -95,8 +95,9 @@ julia> join(p"~/.julia/v0.6", "REQUIRE")
 p"~/.julia/v0.6/REQUIRE"
 ```
 """
-function Base.join(pieces::Union{AbstractPath, AbstractString}...)
+function Base.join(root::AbstractPath, pieces::Union{AbstractPath, AbstractString}...)
     all_parts = String[]
+    push!(all_parts, parts(root)...)
 
     for p in map(Path, pieces)
         push!(all_parts, parts(p)...)

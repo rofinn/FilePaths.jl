@@ -18,7 +18,7 @@ cd(abs(parent(Path(@__FILE__)))) do
         @test_throws ErrorException parents(p".")
 
         @test basename(p) == "FilePaths.jl"
-        @test joinpath(parent(p), Path(basename(p))) == p
+        @test join(parent(p), Path(basename(p))) == p
         @test filename(p) == "FilePaths"
 
         @test extension(p) == "jl"
