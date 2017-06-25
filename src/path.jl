@@ -1,24 +1,28 @@
 import URIParser: URI
 import Glob: glob
 
-Path() = @static is_unix() ? PosixPath() : WindowsPath()
+"""
+    Path()
+    Path(path::AbstractPath)
+    Path(path::Tuple)
+    Path(path::AbstractString)
 
+Responsible for creating the appropriate platform specific path
+(e.g., `PosixPath` and `WindowsPath` for Unix and Windows systems respectively)
+"""
+Path() = @static is_unix() ? PosixPath() : WindowsPath()
 Path(path::AbstractPath) = path
 Path(pieces::Tuple) = @static is_unix() ? PosixPath(pieces) : WindowsPath(pieces, "")
-
-# Generic constructor which will create the appropriate
-# implementation based on the host platform.
-function Path(str::AbstractString)
-    @static if is_unix()
-        PosixPath(str)
-    else
-        WindowsPath(str)
-    end
-end
+Path(str::AbstractString) = @static is_unix() ? PosixPath(str) : WindowsPath(str)
 
 Base.show(io::IO, path::AbstractPath) = print(io, "p\"$(join(parts(path), '/'))\"")
 
-# non-standard string literal
+"""
+    @p_str -> Path
+
+Constructs a `Path` (platform specific subtype of `AbstractPath`), such as
+`p"~/.juliarc.jl"`.
+"""
 macro p_str(path)
     Path(path)
 end
@@ -32,10 +36,44 @@ Path Modifiers
 The following are methods for working with and extracting
 path components
 =#
+"""
+    hasparent(path::AbstractPath) -> Bool
+
+Returns whether there is a parent directory component to the supplied path.
+"""
 hasparent(path::AbstractPath) = length(parts(path)) > 1
 
+"""
+    parent{T<:AbstractPath}(path::T) -> T
+
+Returns the parent of the supplied path.
+
+# Example
+```
+julia> parent(p"~/.julia/v0.6/REQUIRE")
+p"~/.julia/v0.6"
+```
+
+# Throws
+* `ErrorException`: if `path` doesn't have a parent
+"""
 Base.parent(path::AbstractPath) = parents(path)[end]
 
+"""
+    parents{T<:AbstractPath}(path::T) -> Array{T}
+
+# Example
+```
+julia> parents(p"~/.julia/v0.6/REQUIRE")
+3-element Array{FilePaths.PosixPath,1}:
+ p"~"
+ p"~/.julia"
+ p"~/.julia/v0.6"
+ ```
+
+# Throws
+* `ErrorException`: if `path` doesn't have a parent
+"""
 function parents{T<:AbstractPath}(path::T)
     if hasparent(path)
         return map(1:length(parts(path))-1) do i
@@ -46,8 +84,17 @@ function parents{T<:AbstractPath}(path::T)
     end
 end
 
-# Base.include(path::AbstractPath) = include(String(path))
+"""
+    join(pieces::Union{AbstractPath, AbstractString}) -> AbstractPath
 
+Joins path components into a full path.
+
+# Example
+```
+julia> join(p"~/.julia/v0.6", "REQUIRE")
+p"~/.julia/v0.6/REQUIRE"
+```
+"""
 function Base.join(pieces::Union{AbstractPath, AbstractString}...)
     all_parts = String[]
 
@@ -60,11 +107,33 @@ end
 
 Base.basename(path::AbstractPath) = parts(path)[end]
 
+"""
+    filename(path::AbstractPath) -> AbstractString
+
+Extracts the `basename` without any extensions.
+
+# Example
+```
+julia> filename(p"~/repos/FilePaths.jl/src/FilePaths.jl")
+"FilePaths"
+```
+"""
 function filename(path::AbstractPath)
     name = basename(path)
     return split(name, '.')[1]
 end
 
+"""
+    extension(path::AbstractPath) -> AbstractString
+
+Extracts the last extension from a filename if there any, otherwise it returns an empty string.
+
+# Example
+```
+julia> extension(p"~/repos/FilePaths.jl/src/FilePaths.jl")
+"jl"
+```
+"""
 function extension(path::AbstractPath)
     name = basename(path)
 
@@ -76,6 +145,19 @@ function extension(path::AbstractPath)
     end
 end
 
+"""
+    extension(path::AbstractPath) -> AbstractString
+
+Extracts all extensions from a filename if there any, otherwise it returns an empty string.
+
+# Example
+```
+julia> extensions(p"~/repos/FilePaths.jl/src/FilePaths.jl.bak")
+2-element Array{SubString{String},1}:
+ "jl"
+ "bak"
+```
+"""
 function extensions(path::AbstractPath)
     name = basename(path)
 
@@ -87,10 +169,35 @@ function extensions(path::AbstractPath)
     end
 end
 
+"""
+    isempty(path::AbstractPath) -> Bool
+
+Returns whether or not a path is empty.
+
+NOTE: Empty paths are usually only created by `Path()`, as `p""` and `Path("")` will
+default to using the current directory (or `p"."`).
+"""
 Base.isempty(path::AbstractPath) = isempty(parts(path))
+
+"""
+    exists(path::AbstractPath) -> Bool
+
+Returns whether the path actually exists on the system.
+"""
 exists(path::AbstractPath) = ispath(String(path))
+
+"""
+    real(path::AbstractPath) -> AbstractPath
+
+Canonicalizes a path by expanding symlinks and removing "." and ".." entries.
+"""
 Base.real(path::AbstractPath) = Path(realpath(String(path)))
 
+"""
+    norm(path::AbstractPath) -> AbstractPath
+
+Normalizes a path by removing "." and ".." entries.
+"""
 function Base.norm{T<:AbstractPath}(path::T)
     p = parts(path)
     result = String[]
@@ -118,6 +225,11 @@ function Base.norm{T<:AbstractPath}(path::T)
     return T(tuple(fill("..", del)..., reverse(result)...))
 end
 
+"""
+    abs(path::AbstractPath) -> AbstractPath
+
+Creates an absolute path by adding the current working directory if necessary.
+"""
 function Base.abs(path::AbstractPath)
     result = expanduser(path)
 
@@ -128,6 +240,11 @@ function Base.abs(path::AbstractPath)
     end
 end
 
+"""
+    relative{T<:AbstractPath}(path::T, start::T=T("."))
+
+Creates a relative path from either the current directory or an arbitrary start directory.
+"""
 function relative{T<:AbstractPath}(path::T, start::T=T("."))
     curdir = "."
     pardir = ".."
@@ -147,7 +264,6 @@ function relative{T<:AbstractPath}(path::T, start::T=T("."))
     end
 
     pathpart = p[i+1:findlast(x -> !isempty(x), p)]
-    #pathpart = join(path_arr[i+1:findlast(x -> !isempty(x), path_arr)], path_separator)
     prefix_num = findlast(x -> !isempty(x), s) - i - 1
     if prefix_num >= 0
         relpath_ = isempty(pathpart) ?
@@ -159,11 +275,36 @@ function relative{T<:AbstractPath}(path::T, start::T=T("."))
     return isempty(relpath_) ? T(curdir) : T(relpath_)
 end
 
+"""
+    glob{T<:AbstractPath}(path::T, pattern::AbstractString) -> Array{T}
+
+Returns all subpaths along the provided `path` which match the glob `pattern`.
+
+# Example
+```
+julia> glob(p"src", "*.jl")
+9-element Array{FilePaths.PosixPath,1}:
+ p"src/FilePaths.jl"
+ p"src/constants.jl"
+ p"src/deprecates.jl"
+ p"src/libc.jl"
+ p"src/mode.jl"
+ p"src/path.jl"
+ p"src/posix.jl"
+ p"src/status.jl"
+ p"src/windows.jl"
+```
+"""
 function glob{T<:AbstractPath}(path::T, pattern::AbstractString)
     matches = glob(pattern, String(path))
     map(T, matches)
 end
 
+"""
+    uri(path::AbstractPath) -> AbstractPath
+
+Creates a `file://` `URI` from the `path`.
+"""
 function uri(path::AbstractPath)
     if isempty(root(path))
         error("$path is not an absolute path")
@@ -180,9 +321,45 @@ built around stat
 =#
 Base.stat(path::AbstractPath) = Status(stat(String(path)))
 Base.lstat(path::AbstractPath) = Status(lstat(String(path)))
+
+"""
+    mode(path::AbstractPath) -> Mode
+
+Returns the `Mode` for the specified path.
+
+# Example
+```
+julia> mode(p"src/FilePaths.jl")
+-rw-r--r--
+```
+"""
 mode(path::AbstractPath) = stat(path).mode
 Base.size(path::AbstractPath) = stat(path).size
+
+"""
+    modified(path::AbstractPath) -> DateTime
+
+Returns the last modified date for the `path`.
+
+# Example
+```
+julia> modified(p"src/FilePaths.jl")
+2017-06-20T04:01:09
+```
+"""
 modified(path::AbstractPath) = stat(path).mtime
+
+"""
+    created(path::AbstractPath) -> DateTime
+
+Returns the creation date for the `path`.
+
+# Example
+```
+julia> created(p"src/FilePaths.jl")
+2017-06-20T04:01:09
+```
+"""
 created(path::AbstractPath) = stat(path).ctime
 Base.isdir(path::AbstractPath) = isdir(mode(path))
 Base.isfile(path::AbstractPath) = isfile(mode(path))
@@ -192,6 +369,11 @@ Base.isfifo(path::AbstractPath) = issocket(mode(path))
 Base.ischardev(path::AbstractPath) = ischardev(mode(path))
 Base.isblockdev(path::AbstractPath) = isblockdev(mode(path))
 
+"""
+    isexecutable(path::AbstractPath) -> Bool
+
+Returns whether the `path` is executable for the current user.
+"""
 function isexecutable(path::AbstractPath)
     s = stat(path)
     usr = User()
@@ -201,6 +383,11 @@ function isexecutable(path::AbstractPath)
         ( usr.gid == s.group.gid && isexecutable(s.mode, :GROUP) )
 end
 
+"""
+    iswritable(path::AbstractPath) -> Bool
+
+Returns whether the `path` is writable for the current user.
+"""
 function Base.iswritable(path::AbstractPath)
     s = stat(path)
     usr = User()
@@ -210,6 +397,11 @@ function Base.iswritable(path::AbstractPath)
         ( usr.gid == s.group.gid && iswritable(s.mode, :GROUP) )
 end
 
+"""
+    isreadable(path::AbstractPath) -> Bool
+
+Returns whether the `path` is readable for the current user.
+"""
 function Base.isreadable(path::AbstractPath)
     s = stat(path)
     usr = User()
@@ -241,6 +433,8 @@ filesystem.
 NOTE: Currently, we are just wrapping base julia functions,
 but in the future we'll likely be handling platform specific
 code in the implementation instances.
+
+TODO: Document these once we're comfortable with them.
 =#
 
 Base.cd(path::AbstractPath) = cd(String(path))
@@ -253,8 +447,6 @@ function Base.cd(fn::Function, dir::AbstractPath)
         cd(old)
     end
 end
-
-# exist_ok=true, overwrite=true
 
 function Base.mkdir(path::AbstractPath; mode=0o777, recursive=false, exist_ok=false)
     if exists(path)
