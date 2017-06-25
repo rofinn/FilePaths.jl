@@ -1,5 +1,5 @@
 
-cd(abs(parent( Path(string(@__FILE__)) ))) do
+cd(abs(parent(Path(@__FILE__)))) do
     @testset "Simple Path Usage" begin
         reg = "../src/FilePaths.jl"
         @test ispath(reg)
@@ -7,9 +7,9 @@ cd(abs(parent( Path(string(@__FILE__)) ))) do
         p = Path(reg)
 
         @test p == p"../src/FilePaths.jl"
-        @test string(p) == reg
-        @test string(cwd()) == pwd()
-        @test string(home()) == homedir()
+        @test String(p) == reg
+        @test String(cwd()) == pwd()
+        @test String(home()) == homedir()
 
         @test parts(p) == ("..", "src", "FilePaths.jl")
         @test hasparent(p)
@@ -28,9 +28,9 @@ cd(abs(parent( Path(string(@__FILE__)) ))) do
 
         @test exists(p)
         @test !isabs(p)
-        @test string(norm(p"../src/../src/FilePaths.jl")) == normpath("../src/../src/FilePaths.jl")
-        @test string(abs(p)) == abspath(string(p))
-        @test string(relative(p, home())) == relpath(string(p), homedir())
+        @test String(norm(p"../src/../src/FilePaths.jl")) == normpath("../src/../src/FilePaths.jl")
+        @test String(abs(p)) == abspath(String(p))
+        @test String(relative(p, home())) == relpath(String(p), homedir())
         @test uri(PosixPath("/foo/bar")) == URI("file:///foo/bar")
         @test_throws ErrorException uri(p"foo/bar")
 
@@ -111,7 +111,7 @@ mktmpdir() do d
             end
 
             chmod(p"newfile", user=(READ+WRITE+EXEC), group=(READ+EXEC), other=READ)
-            @test string(mode(p"newfile")) == "-rwxr-xr--"
+            @test String(mode(p"newfile")) == "-rwxr-xr--"
             @test isexecutable(p"newfile")
             @test iswritable(p"newfile")
             @test isreadable(p"newfile")
@@ -119,7 +119,7 @@ mktmpdir() do d
             chmod(p"newfile", "-x")
             @test !isexecutable(p"newfile")
 
-            @test string(mode(p"newfile")) == "-rw-r--r--"
+            @test String(mode(p"newfile")) == "-rw-r--r--"
             chmod(p"newfile", "+x")
             write(p"newfile", "foobar")
             @test read(p"newfile") == "foobar"

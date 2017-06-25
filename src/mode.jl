@@ -44,6 +44,7 @@ function Mode(mode::UInt8, usr_grps::Symbol...)
 end
 
 Base.show(io::IO, mode::Mode) = print(io, string(mode))
+Base.String(mode::Mode) = string(mode)
 
 Base.:-(a::Mode, b::Mode) = Mode(a.m & ~b.m)
 Base.:+(a::Mode, b::Mode) = Mode(a.m | b.m)

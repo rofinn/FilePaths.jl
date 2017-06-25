@@ -3,6 +3,8 @@ immutable WindowsPath <: AbstractPath
     drive::String
 end
 
+WindowsPath() = WindowsPath(tuple(), "")
+
 function WindowsPath(str::AbstractString)
     if isempty(str)
         return WindowsPath(tuple("."), "")
@@ -15,13 +17,13 @@ function WindowsPath(str::AbstractString)
         tokenized[1] = WIN_PATH_SEPARATOR
     end
 
-    return WindowsPath(tuple(tokenized...), drive)
+    return WindowsPath(drive, tuple(map(String, tokenized)...))
 end
 
 
 # The following should be implemented in the concrete types
 ==(a::WindowsPath, b::WindowsPath) = parts(a) == parts(b) && drive(a) == drive(b)
-Base.string(path::WindowsPath) = joinpath(parts(path)...)
+Base.String(path::WindowsPath) = joinpath(parts(path)...)
 parts(path::WindowsPath) = path.parts
 drive(path::WindowsPath) = path.drive
 
@@ -42,4 +44,3 @@ function root(path::WindowsPath)
 end
 
 expanduser(path::WindowsPath) = path
-

@@ -56,12 +56,18 @@ else
     export isexecutable
 end
 
-@compat abstract type AbstractPath end
+@compat abstract type AbstractPath <: AbstractString end
+
+# Required methods for subtype of AbstractString
+Base.endof(p::AbstractPath) = endof(String(p))
+Base.next(p::AbstractPath, i::Int) = next(String(p), i)
 
 # The following should be implemented in the concrete types
-Base.string(path::AbstractPath) = error("`string not implemented")
+Base.String(path::AbstractPath) = error("`String not implemented")
 parts(path::AbstractPath) = error("`parts` not implemented.")
 root(path::AbstractPath) = error("`root` not implemented.")
+
+Base.convert(::Type{AbstractPath}, x::AbstractString) = Path(x)
 
 include("constants.jl")
 include("libc.jl")
@@ -70,5 +76,6 @@ include("status.jl")
 include("posix.jl")
 include("windows.jl")
 include("path.jl")
+include("deprecates.jl")
 
 end # end of module

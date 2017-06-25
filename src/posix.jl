@@ -2,6 +2,8 @@ immutable PosixPath <: AbstractPath
     parts::Tuple
 end
 
+PosixPath() = PosixPath(tuple())
+
 function PosixPath(str::AbstractString)
     str = String(str)
 
@@ -13,12 +15,12 @@ function PosixPath(str::AbstractString)
     if isempty(tokenized[1])
         tokenized[1] = POSIX_PATH_SEPARATOR
     end
-    return PosixPath(tuple(tokenized...))
+    return PosixPath(tuple(map(String, tokenized)...))
 end
 
 # The following should be implemented in the concrete types
 ==(a::PosixPath, b::PosixPath) = parts(a) == parts(b)
-Base.string(path::PosixPath) = joinpath(parts(path)...)
+Base.String(path::PosixPath) = joinpath(parts(path)...)
 parts(path::PosixPath) = path.parts
 
 function isabs(path::PosixPath)

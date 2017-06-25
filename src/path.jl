@@ -1,6 +1,11 @@
 import URIParser: URI
 import Glob: glob
 
+Path() = @static is_unix() ? PosixPath() : WindowsPath()
+
+Path(path::AbstractPath) = path
+Path(pieces::Tuple) = @static is_unix() ? PosixPath(pieces) : WindowsPath(pieces, "")
+
 # Generic constructor which will create the appropriate
 # implementation based on the host platform.
 function Path(str::AbstractString)
@@ -10,6 +15,8 @@ function Path(str::AbstractString)
         WindowsPath(str)
     end
 end
+
+Base.show(io::IO, path::AbstractPath) = print(io, "p\"$(join(parts(path), '/'))\"")
 
 # non-standard string literal
 macro p_str(path)
@@ -35,18 +42,20 @@ function parents{T<:AbstractPath}(path::T)
             T(parts(path)[1:i])
         end
     else
-        error("$(string(path)) has no parents")
+        error("$path has no parents")
     end
 end
 
-function Base.joinpath{T<:AbstractPath}(pieces::T...)
+# Base.include(path::AbstractPath) = include(String(path))
+
+function Base.join(pieces::Union{AbstractPath, AbstractString}...)
     all_parts = String[]
 
-    for p in pieces
+    for p in map(Path, pieces)
         push!(all_parts, parts(p)...)
     end
 
-    return T(tuple(all_parts...))
+    return Path(tuple(all_parts...))
 end
 
 Base.basename(path::AbstractPath) = parts(path)[end]
@@ -78,8 +87,9 @@ function extensions(path::AbstractPath)
     end
 end
 
-exists(path::AbstractPath) = ispath(string(path))
-Base.real(path::AbstractPath) = Path(realpath(string(path)))
+Base.isempty(path::AbstractPath) = isempty(parts(path))
+exists(path::AbstractPath) = ispath(String(path))
+Base.real(path::AbstractPath) = Path(realpath(String(path)))
 
 function Base.norm{T<:AbstractPath}(path::T)
     p = parts(path)
@@ -114,7 +124,7 @@ function Base.abs(path::AbstractPath)
     if isabs(result)
         return norm(result)
     else
-        return norm(joinpath(cwd(), result))
+        return norm(join(cwd(), result))
     end
 end
 
@@ -150,16 +160,16 @@ function relative{T<:AbstractPath}(path::T, start::T=T("."))
 end
 
 function glob{T<:AbstractPath}(path::T, pattern::AbstractString)
-    matches = glob(pattern, string(path))
+    matches = glob(pattern, String(path))
     map(T, matches)
 end
 
 function uri(path::AbstractPath)
     if isempty(root(path))
-        error("$(string(path)) is not an absolute path")
+        error("$path is not an absolute path")
     end
 
-    uri_str = "file://$(string(path))"
+    uri_str = "file://$(String(path))"
 
     return URI(uri_str)
 end
@@ -168,15 +178,15 @@ end
 The following a descriptive methods for paths
 built around stat
 =#
-Base.stat(path::AbstractPath) = Status(stat(string(path)))
-Base.lstat(path::AbstractPath) = Status(lstat(string(path)))
+Base.stat(path::AbstractPath) = Status(stat(String(path)))
+Base.lstat(path::AbstractPath) = Status(lstat(String(path)))
 mode(path::AbstractPath) = stat(path).mode
 Base.size(path::AbstractPath) = stat(path).size
 modified(path::AbstractPath) = stat(path).mtime
 created(path::AbstractPath) = stat(path).ctime
 Base.isdir(path::AbstractPath) = isdir(mode(path))
 Base.isfile(path::AbstractPath) = isfile(mode(path))
-Base.islink(path::AbstractPath) = islink(mode(path))
+Base.islink(path::AbstractPath) = islink(lstat(path).mode)
 Base.issocket(path::AbstractPath) = issocket(mode(path))
 Base.isfifo(path::AbstractPath) = issocket(mode(path))
 Base.ischardev(path::AbstractPath) = ischardev(mode(path))
@@ -233,7 +243,7 @@ but in the future we'll likely be handling platform specific
 code in the implementation instances.
 =#
 
-Base.cd(path::AbstractPath) = cd(string(path))
+Base.cd(path::AbstractPath) = cd(String(path))
 function Base.cd(fn::Function, dir::AbstractPath)
     old = cwd()
     try
@@ -244,12 +254,14 @@ function Base.cd(fn::Function, dir::AbstractPath)
     end
 end
 
+# exist_ok=true, overwrite=true
+
 function Base.mkdir(path::AbstractPath; mode=0o777, recursive=false, exist_ok=false)
-    if exists(path) && !exist_ok
-        error("$path already exists.")
+    if exists(path)
+        !exist_ok && error("$path already exists.")
     else
         if !hasparent(path) || exists(parent(path))
-            mkdir(string(path), mode)
+            mkdir(String(path), mode)
         elseif hasparent(path) && !exists(parent(path)) && recursive
             mkdir(parent(path); mode=mode, recursive=recursive, exist_ok=exist_ok)
         else
@@ -268,7 +280,7 @@ function Base.symlink(src::AbstractPath, dest::AbstractPath; exist_ok=false, ove
         end
 
         if !exists(dest)
-            symlink(string(src), string(dest))
+            symlink(String(src), String(dest))
         elseif !exist_ok
             error("$dest already exists.")
         end
@@ -312,7 +324,7 @@ function move(src::AbstractPath, dest::AbstractPath; recursive=false, exist_ok=f
                 mkdir(parent(dest); recursive=recursive, exist_ok=true)
             end
 
-            mv(string(src), string(dest))
+            mv(String(src), String(dest))
         elseif !exist_ok
             error("$dest already exists.")
         end
@@ -322,21 +334,21 @@ function move(src::AbstractPath, dest::AbstractPath; recursive=false, exist_ok=f
 end
 
 function Base.cp(src::AbstractPath, dest::AbstractPath; remove_destination::Bool=false, follow_symlinks::Bool=false)
-    cp(string(src), string(dest); remove_destination=remove_destination, follow_symlinks=follow_symlinks)
+    cp(String(src), String(dest); remove_destination=remove_destination, follow_symlinks=follow_symlinks)
 end
 
-remove(path::AbstractPath; recursive=false) = rm(string(path); recursive=recursive)
-Base.touch(path::AbstractPath) = touch(string(path))
+remove(path::AbstractPath; recursive=false) = rm(String(path); recursive=recursive)
+Base.touch(path::AbstractPath) = touch(String(path))
 
 tmpname() = Path(tempname())
 tmpdir() = Path(tempdir())
 
 function mktmp(parent::AbstractPath=Path(tempdir()))
-    path, io = mktemp(string(parent))
+    path, io = mktemp(String(parent))
     return Path(path), io
 end
 
-mktmpdir(parent::AbstractPath=tmpdir()) = Path(mktempdir(string(parent)))
+mktmpdir(parent::AbstractPath=tmpdir()) = Path(mktempdir(String(parent)))
 
 function mktmp(fn::Function, parent=tmpdir())
     (tmp_path, tmp_io) = mktmp(parent)
@@ -363,7 +375,7 @@ function Base.chown(path::AbstractPath, user::AbstractString, group::AbstractStr
         if recursive
             push!(chown_cmd, "-R")
         end
-        append!(chown_cmd, String["$(user):$(group)", string(path)])
+        append!(chown_cmd, String["$(user):$(group)", String(path)])
 
         run(Cmd(chown_cmd))
     else
@@ -372,7 +384,7 @@ function Base.chown(path::AbstractPath, user::AbstractString, group::AbstractStr
 end
 
 function Base.chmod(path::AbstractPath, mode::Mode; recursive=false)
-    chmod_path = string(path)
+    chmod_path = String(path)
     chmod_mode = raw(mode)
 
     if isdir(path) && recursive
@@ -381,7 +393,7 @@ function Base.chmod(path::AbstractPath, mode::Mode; recursive=false)
         end
     end
 
-    chmod(string(path), raw(mode))
+    chmod(chmod_path, chmod_mode)
 end
 
 function Base.chmod(path::AbstractPath; user::UInt8=0o0, group::UInt8=0o0, other::UInt8=0o0, recursive=false)
@@ -439,10 +451,20 @@ function Base.chmod(path::AbstractPath, symbolic_mode::AbstractString; recursive
     end
 end
 
-Base.read(path::AbstractPath) = open(readstring, string(path))
+Base.read(path::AbstractPath) = open(readstring, String(path))
 
-function Base.write(path::AbstractPath, content::AbstractString)
-    open(string(path), "w") do f
+function Base.write(path::AbstractPath, content::AbstractString, mode="w")
+    open(String(path), mode) do f
         write(f, content)
     end
+end
+
+Base.readlink(path::AbstractPath) = Path(readlink(String(path)))
+Base.readdir(path::AbstractPath) = map(Path, readdir(String(path)))
+
+function Base.download(src::AbstractString, dest::AbstractPath, overwrite::Bool=false)
+    if !exists(dest) || overwrite
+        download(src, String(dest))
+    end
+    return dest
 end
