@@ -561,6 +561,11 @@ function mktmpdir(fn::Function, parent=tmpdir())
     end
 end
 
+"""
+    chown(path::AbstractPath, user::AbstractString, group::AbstractString; recursive=false)
+
+Change the `user` and `group` of the `path`.
+"""
 function Base.chown(path::AbstractPath, user::AbstractString, group::AbstractString; recursive=false)
     @static if is_unix()
         chown_cmd = String["chown"]
@@ -575,6 +580,43 @@ function Base.chown(path::AbstractPath, user::AbstractString, group::AbstractStr
     end
 end
 
+"""
+    chmod(path::AbstractPath, mode::Mode; recursive=false)
+    chmod(path::AbstractPath, mode::Integer; recursive=false)
+    chmod(path::AbstractPath, user::UIn8=0o0, group::UInt8=0o0, other::UInt8=0o0; recursive=false)
+    chmod(path::AbstractPath, symbolic_mode::AbstractString; recursive=false)
+
+Provides various methods for changing the `mode` of a `path`.
+
+# Examples
+```
+julia> touch(p"newfile")
+Base.Filesystem.File(false, RawFD(-1))
+
+julia> mode(p"newfile")
+-rw-r--r--
+
+julia> chmod(p"newfile", 0o755)
+
+julia> mode(p"newfile")
+-rwxr-xr-x
+
+julia> chmod(p"newfile", "-x")
+
+julia> mode(p"newfile")
+-rw-r--r--
+
+julia> chmod(p"newfile", user=(READ+WRITE+EXEC), group=(READ+EXEC), other=READ)
+
+julia> mode(p"newfile")
+-rwxr-xr--
+
+julia> chmod(p"newfile", mode(p"src/FilePaths.jl"))
+
+julia> mode(p"newfile")
+-rw-r--r--
+```
+"""
 function Base.chmod(path::AbstractPath, mode::Mode; recursive=false)
     chmod_path = String(path)
     chmod_mode = raw(mode)
@@ -586,6 +628,10 @@ function Base.chmod(path::AbstractPath, mode::Mode; recursive=false)
     end
 
     chmod(chmod_path, chmod_mode)
+end
+
+function Base.chmod(path::AbstractPath, mode::Integer; recursive=false)
+    chmod(path, Mode(mode); recursive=recursive)
 end
 
 function Base.chmod(path::AbstractPath; user::UInt8=0o0, group::UInt8=0o0, other::UInt8=0o0, recursive=false)
