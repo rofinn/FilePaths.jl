@@ -33,10 +33,10 @@ function Mode(mode::UInt8, usr_grps::Symbol...)
         elseif usr_grp == :OTHER
             other = mode
         else
-            error(
-                "$usr_grp not a valid symbol only \
-                :ALL, :USER, :GROUP and :OTHER are accepted."
-            )
+            throw(ArgumentError(
+                "$usr_grp not a valid symbol only " *
+                ":ALL, :USER, :GROUP and :OTHER are accepted."
+            ))
         end
     end
 
