@@ -17,7 +17,7 @@ function WindowsPath(str::AbstractString)
         tokenized[1] = WIN_PATH_SEPARATOR
     end
 
-    return WindowsPath(drive, tuple(map(String, tokenized)...))
+    return WindowsPath(tuple(map(String, tokenized)...), drive)
 end
 
 
