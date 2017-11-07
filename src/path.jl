@@ -15,8 +15,6 @@ Path(path::AbstractPath) = path
 Path(pieces::Tuple) = @static is_unix() ? PosixPath(pieces) : WindowsPath(pieces)
 Path(str::AbstractString) = @static is_unix() ? PosixPath(str) : WindowsPath(str)
 
-Base.show(io::IO, path::AbstractPath) = print(io, "p\"$(join(parts(path), '/'))\"")
-
 """
     @p_str -> Path
 

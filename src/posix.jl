@@ -23,6 +23,8 @@ end
 Base.String(path::PosixPath) = joinpath(parts(path)...)
 parts(path::PosixPath) = path.parts
 
+Base.show(io::IO, path::PosixPath) = print(io, "p\"$(join(parts(path), '/'))\"")
+
 function isabs(path::PosixPath)
     if parts(path)[1] == POSIX_PATH_SEPARATOR
         return true
