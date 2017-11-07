@@ -56,11 +56,7 @@ else
     export isexecutable
 end
 
-@compat abstract type AbstractPath <: AbstractString end
-
-# Required methods for subtype of AbstractString
-Base.endof(p::AbstractPath) = endof(String(p))
-Base.next(p::AbstractPath, i::Int) = next(String(p), i)
+@compat abstract type AbstractPath end
 
 # The following should be implemented in the concrete types
 Base.String(path::AbstractPath) = error("`String not implemented")
