@@ -145,7 +145,7 @@ function extension(path::AbstractPath)
 end
 
 """
-    extension(path::AbstractPath) -> AbstractString
+    extensions(path::AbstractPath) -> AbstractString
 
 Extracts all extensions from a filename if there any, otherwise it returns an empty string.
 
