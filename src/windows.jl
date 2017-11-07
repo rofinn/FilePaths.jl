@@ -4,13 +4,13 @@ immutable WindowsPath <: AbstractPath
     root::String
 end
 
-WindowsPath() = WindowsPath(tuple("."), "", "")
+WindowsPath() = WindowsPath(tuple(), "", "")
 
 WindowsPath(parts::Tuple) = WindowsPath(parts, "", "")
 
 function WindowsPath(str::AbstractString)
     if isempty(str)
-        return WindowsPath()
+        return WindowsPath(tuple("."), "", "")
     end
 
     if startswith(str, "\\\\?\\")
