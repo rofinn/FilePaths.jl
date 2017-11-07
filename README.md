@@ -6,9 +6,9 @@
 FilePaths.jl provides a type based approach to working with filesystem paths in julia.
 
 ## Intallation:
-FilePaths.jl isn't registered, so you'll need to use `Pkg.clone` to install it.
+FilePaths.jl is registered, so you can to use `Pkg.add` to install it.
 ```julia
-julia> Pkg.clone("https://github.com/rofinn/FilePaths.jl")
+julia> Pkg.add("FilePaths")
 ```
 
 ## Usage:
