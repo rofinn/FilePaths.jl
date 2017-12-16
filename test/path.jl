@@ -31,10 +31,6 @@ cd(abs(parent(Path(@__FILE__)))) do
         @test String(norm(p"../src/../src/FilePaths.jl")) == normpath("../src/../src/FilePaths.jl")
         @test String(abs(p)) == abspath(String(p))
         @test String(relative(p, home())) == relpath(String(p), homedir())
-        @test uri(PosixPath("/foo/bar")) == URI("file:///foo/bar")
-        @test_throws ErrorException uri(p"foo/bar")
-
-        @test p"../src/FilePaths.jl" in glob(p"../src", "*.jl")
 
         s = stat(p)
         lstat(p)
