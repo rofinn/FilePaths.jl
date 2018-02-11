@@ -1,6 +1,3 @@
-import URIParser: URI
-import Glob: glob
-
 """
     Path()
     Path(path::AbstractPath)
@@ -272,46 +269,6 @@ function relative{T<:AbstractPath}(path::T, start::T=T("."))
         relpath_ = pathpart
     end
     return isempty(relpath_) ? T(curdir) : T(relpath_)
-end
-
-"""
-    glob{T<:AbstractPath}(path::T, pattern::AbstractString) -> Array{T}
-
-Returns all subpaths along the provided `path` which match the glob `pattern`.
-
-# Example
-```
-julia> glob(p"src", "*.jl")
-9-element Array{FilePaths.PosixPath,1}:
- p"src/FilePaths.jl"
- p"src/constants.jl"
- p"src/deprecates.jl"
- p"src/libc.jl"
- p"src/mode.jl"
- p"src/path.jl"
- p"src/posix.jl"
- p"src/status.jl"
- p"src/windows.jl"
-```
-"""
-function glob{T<:AbstractPath}(path::T, pattern::AbstractString)
-    matches = glob(pattern, String(path))
-    map(T, matches)
-end
-
-"""
-    uri(path::AbstractPath) -> AbstractPath
-
-Creates a `file://` `URI` from the `path`.
-"""
-function uri(path::AbstractPath)
-    if isempty(root(path))
-        error("$path is not an absolute path")
-    end
-
-    uri_str = "file://$(String(path))"
-
-    return URI(uri_str)
 end
 
 #=
@@ -621,7 +578,7 @@ function Base.chmod(path::AbstractPath, mode::Mode; recursive=false)
     chmod_mode = raw(mode)
 
     if isdir(path) && recursive
-        for p in glob(path, "*")
+        for p in readdir(path)
             chmod(chmod_path, chmod_mode; recursive=recursive)
         end
     end

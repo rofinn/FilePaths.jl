@@ -81,3 +81,5 @@ const FILEMODE_TABLE = (
      (S_ISVTX,         "T"),
      (S_IXOTH,         "x"))
 )
+
+const DATA_SUFFIX = ["", "K", "M", "G", "T", "P", "E", "Z", "Y"]

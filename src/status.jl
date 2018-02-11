@@ -1,5 +1,4 @@
 using Base.Dates
-using Humanize
 
 import Base.Filesystem: StatStruct
 
@@ -44,8 +43,8 @@ function Base.show(io::IO, s::Status)
         "  uid = $(s.user),\n" *
         "  gid = $(s.group),\n" *
         "  rdev = $(s.rdev),\n" *
-        "  size = $(s.size) ($(datasize(s.size, style=:gnu))),\n" *
-        "  blksize = $(s.blksize) ($(datasize(s.blksize, style=:gnu))),\n" *
+        "  size = $(s.size) ($(_datasize(s.size))),\n" *
+        "  blksize = $(s.blksize) ($(_datasize(s.blksize))),\n" *
         "  blocks = $(s.blocks),\n" *
         "  mtime = $(s.mtime),\n" *
         "  ctime = $(s.ctime),\n)"

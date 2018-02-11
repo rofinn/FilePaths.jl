@@ -30,8 +30,6 @@ export
     created,
     modified,
     relative,
-    glob,
-    uri,
     move,
     remove,
     tmpname,
@@ -73,6 +71,7 @@ drive(path::AbstractPath) = error("`drive` not implemented.")
 Base.convert(::Type{AbstractPath}, x::AbstractString) = Path(x)
 
 include("constants.jl")
+include("utils.jl")
 include("libc.jl")
 include("mode.jl")
 include("status.jl")
