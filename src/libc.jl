@@ -76,7 +76,7 @@ function User(name::String)
     User(ps)
 end
 
-function User(uid::UInt64)
+function User(uid::UInt)
     ps = @static if is_unix()
         ccall((:getpwuid, "libc"), Ptr{Cpasswd}, (UInt64,), uid)
     else
