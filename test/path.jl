@@ -38,6 +38,9 @@ cd(abs(parent(Path(@__FILE__)))) do
         end
         @test String(relative(p, home())) == relpath(String(p), homedir_patched)
 
+        @test isa(relative(Path(".")), AbstractPath)
+        @test relative(Path(".")) == Path(".")
+
         s = stat(p)
         lstat(p)
 

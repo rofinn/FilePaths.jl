@@ -248,8 +248,7 @@ function relative{T<:AbstractPath}(path::T, start::T=T("."))
     p = parts(abs(path))
     s = parts(abs(start))
 
-    # TODO Shouldn't this return a path object?
-    p == s && return curdir
+    p == s && return T(curdir)
 
     i = 0
     while i < min(length(p), length(s))
