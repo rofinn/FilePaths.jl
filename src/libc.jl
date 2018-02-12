@@ -114,7 +114,7 @@ function Group(name::String)
     Group(ps)
 end
 
-function Group(gid::UInt64)
+function Group(gid::UInt)
     gr = @static if is_unix()
         ccall((:getgrgid, "libc"), Ptr{Cgroup}, (UInt64,), gid)
     else
