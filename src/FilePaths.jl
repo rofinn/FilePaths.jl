@@ -16,6 +16,7 @@ export
 
     # Methods
     cwd,
+    drive,
     home,
     parts,
     root,
