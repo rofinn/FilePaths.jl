@@ -30,7 +30,13 @@ cd(abs(parent(Path(@__FILE__)))) do
         @test !isabs(p)
         @test String(norm(p"../src/../src/FilePaths.jl")) == normpath("../src/../src/FilePaths.jl")
         @test String(abs(p)) == abspath(String(p))
-        @test String(relative(p, home())) == relpath(String(p), homedir())
+        # This works around an issue with Base.relpath: that function does not take
+        # into account the paths on Windows should be compared case insensitive.
+        homedir_patched = homedir()
+        if is_windows()
+            homedir_patched = lowercase(homedir_patched[1]) * homedir_patched[2:end]
+        end
+        @test String(relative(p, home())) == relpath(String(p), homedir_patched)
 
         s = stat(p)
         lstat(p)

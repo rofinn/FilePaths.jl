@@ -248,14 +248,22 @@ function relative{T<:AbstractPath}(path::T, start::T=T("."))
     p = parts(abs(path))
     s = parts(abs(start))
 
+    # TODO Shouldn't this return a path object?
     p == s && return curdir
 
     i = 0
     while i < min(length(p), length(s))
         i += 1
-        if p[i] != s[i]
-            i -= 1
-            break
+        @static if is_windows()
+            if lowercase(p[i]) != lowercase(s[i])
+                i -= 1
+                break
+            end
+        else
+            if p[i] != s[i]
+                i -= 1
+                break
+            end
         end
     end
 
