@@ -56,7 +56,6 @@ Base.String(path::WindowsPath) = joinpath(parts(path)...)
 parts(path::WindowsPath) = path.parts
 drive(path::WindowsPath) = path.drive
 root(path::WindowsPath) = path.root
-anchor(path::WindowsPath) = path.drive * path.root
 
 function Base.show(io::IO, path::WindowsPath)
     print(io, "p\"")

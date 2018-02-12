@@ -15,6 +15,7 @@ export
     Status,
 
     # Methods
+    anchor,
     cwd,
     drive,
     home,

@@ -25,6 +25,8 @@ end
 cwd() = Path(pwd())
 home() = Path(homedir())
 
+anchor(path::AbstractPath) = drive(path) * root(path)
+
 #=
 Path Modifiers
 ===============================================
