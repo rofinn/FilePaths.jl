@@ -76,7 +76,7 @@ function User(name::String)
     User(ps)
 end
 
-function User(uid::UInt64)
+function User(uid::UInt)
     ps = @static if is_unix()
         ccall((:getpwuid, "libc"), Ptr{Cpasswd}, (UInt64,), uid)
     else
@@ -114,7 +114,7 @@ function Group(name::String)
     Group(ps)
 end
 
-function Group(gid::UInt64)
+function Group(gid::UInt)
     gr = @static if is_unix()
         ccall((:getgrgid, "libc"), Ptr{Cgroup}, (UInt64,), gid)
     else

@@ -9,10 +9,8 @@ Responsible for creating the appropriate platform specific path
 """
 Path() = @static is_unix() ? PosixPath() : WindowsPath()
 Path(path::AbstractPath) = path
-Path(pieces::Tuple) = @static is_unix() ? PosixPath(pieces) : WindowsPath(pieces, "")
+Path(pieces::Tuple) = @static is_unix() ? PosixPath(pieces) : WindowsPath(pieces)
 Path(str::AbstractString) = @static is_unix() ? PosixPath(str) : WindowsPath(str)
-
-Base.show(io::IO, path::AbstractPath) = print(io, "p\"$(join(parts(path), '/'))\"")
 
 """
     @p_str -> Path
@@ -26,6 +24,8 @@ end
 
 cwd() = Path(pwd())
 home() = Path(homedir())
+
+anchor(path::AbstractPath) = drive(path) * root(path)
 
 #=
 Path Modifiers
@@ -144,7 +144,7 @@ function extension(path::AbstractPath)
 end
 
 """
-    extension(path::AbstractPath) -> AbstractString
+    extensions(path::AbstractPath) -> AbstractString
 
 Extracts all extensions from a filename if there any, otherwise it returns an empty string.
 
@@ -250,14 +250,21 @@ function relative{T<:AbstractPath}(path::T, start::T=T("."))
     p = parts(abs(path))
     s = parts(abs(start))
 
-    p == s && return curdir
+    p == s && return T(curdir)
 
     i = 0
     while i < min(length(p), length(s))
         i += 1
-        if p[i] != s[i]
-            i -= 1
-            break
+        @static if is_windows()
+            if lowercase(p[i]) != lowercase(s[i])
+                i -= 1
+                break
+            end
+        else
+            if p[i] != s[i]
+                i -= 1
+                break
+            end
         end
     end
 

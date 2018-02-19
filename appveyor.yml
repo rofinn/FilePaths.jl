@@ -1,7 +1,5 @@
 environment:
   matrix:
-  - JULIA_URL: "https://julialang-s3.julialang.org/bin/winnt/x86/0.5/julia-0.5-latest-win32.exe"
-  - JULIA_URL: "https://julialang-s3.julialang.org/bin/winnt/x64/0.5/julia-0.5-latest-win64.exe"
   - JULIA_URL: "https://julialang-s3.julialang.org/bin/winnt/x86/0.6/julia-0.6-latest-win32.exe"
   - JULIA_URL: "https://julialang-s3.julialang.org/bin/winnt/x64/0.6/julia-0.6-latest-win64.exe"
 
@@ -31,4 +29,7 @@ build_script:
   - C:\projects\julia\bin\julia -e "Pkg.clone(pwd(), \"FilePaths\"); versioninfo(); Pkg.build(\"FilePaths\")"
 
 test_script:
-  - C:\projects\julia\bin\julia --check-bounds=yes -e "Pkg.test(\"FilePaths\")"
+  - C:\projects\julia\bin\julia --check-bounds=yes -e "Pkg.test(\"FilePaths\", coverage=true)"
+
+after_test:
+  - C:\projects\julia\bin\julia -e "cd(Pkg.dir(\"FilePaths\")); Pkg.add(\"Coverage\"); using Coverage; Codecov.submit(Codecov.process_folder())"

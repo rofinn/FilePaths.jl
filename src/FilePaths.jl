@@ -15,7 +15,9 @@ export
     Status,
 
     # Methods
+    anchor,
     cwd,
+    drive,
     home,
     parts,
     root,
@@ -66,6 +68,7 @@ Base.next(p::AbstractPath, i::Int) = next(String(p), i)
 Base.String(path::AbstractPath) = error("`String not implemented")
 parts(path::AbstractPath) = error("`parts` not implemented.")
 root(path::AbstractPath) = error("`root` not implemented.")
+drive(path::AbstractPath) = error("`drive` not implemented.")
 
 Base.convert(::Type{AbstractPath}, x::AbstractString) = Path(x)
 
