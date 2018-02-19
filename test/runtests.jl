@@ -1,9 +1,9 @@
 using FilePaths
 using Base.Test
 
-info("Beginning tests...")
+@testset "FilePaths" begin
 
 include("mode.jl")
 include("path.jl")
 
-info("All tests passed.")
+end
