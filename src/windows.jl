@@ -48,10 +48,11 @@ function WindowsPath(str::AbstractString)
     end
 end
 
-==(a::WindowsPath, b::WindowsPath) =
-    lowercase.(parts(a)) == lowercase.(parts(b)) &&
-    lowercase(drive(a)) == lowercase(drive(b)) &&
-    lowercase(root(a)) == lowercase(root(b))
+function ==(a::WindowsPath, b::WindowsPath)
+    return lowercase.(parts(a)) == lowercase.(parts(b)) &&
+        lowercase(drive(a)) == lowercase(drive(b)) &&
+        lowercase(root(a)) == lowercase(root(b))
+end
 Base.String(path::WindowsPath) = joinpath(parts(path)...)
 parts(path::WindowsPath) = path.parts
 drive(path::WindowsPath) = path.drive
