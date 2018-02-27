@@ -5,5 +5,6 @@ using Base.Test
 
 include("mode.jl")
 include("path.jl")
+include("test_uri.jl")
 
 end

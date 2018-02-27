@@ -3,6 +3,7 @@ __precompile__()
 module FilePaths
 
 using Compat
+import URIParser
 
 import Base: ==
 export
@@ -80,6 +81,7 @@ include("status.jl")
 include("posix.jl")
 include("windows.jl")
 include("path.jl")
+include("uri.jl")
 include("deprecates.jl")
 
 end # end of module
