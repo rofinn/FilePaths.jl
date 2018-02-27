@@ -6,7 +6,16 @@ end
 
 WindowsPath() = WindowsPath(tuple(), "", "")
 
-WindowsPath(parts::Tuple) = WindowsPath(parts, "", "")
+function WindowsPath(parts::Tuple)
+    if parts[1]==WIN_PATH_SEPARATOR
+        return WindowsPath(parts, "", WIN_PATH_SEPARATOR)
+    elseif contains(parts[1], ":")
+        l_drive, l_path = splitdrive(parts[1])
+        return WindowsPath(parts, l_drive, l_path)
+    else
+        WindowsPath(parts, "", "")
+    end
+end
 
 function WindowsPath(str::AbstractString)
     if isempty(str)
