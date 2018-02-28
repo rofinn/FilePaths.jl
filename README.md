@@ -103,7 +103,6 @@ realpath | real
 normpath | norm
 abspath | abs
 relpath | relative
-N/A | glob
 stat | stat
 lstat | lstat
 filemode | mode
