@@ -4,13 +4,18 @@ immutable WindowsPath <: AbstractPath
     root::String
 end
 
+function _win_splitdrive(path::String)
+    m = match(r"^([^\\]+:|\\\\[^\\]+\\[^\\]+|\\\\\?\\UNC\\[^\\]+\\[^\\]+|\\\\\?\\[^\\]+:|)(.*)$", path)
+    String(m.captures[1]), String(m.captures[2])
+end
+
 WindowsPath() = WindowsPath(tuple(), "", "")
 
 function WindowsPath(parts::Tuple)
     if parts[1]==WIN_PATH_SEPARATOR
         return WindowsPath(parts, "", WIN_PATH_SEPARATOR)
     elseif contains(parts[1], ":")
-        l_drive, l_path = splitdrive(parts[1])
+        l_drive, l_path = _win_splitdrive(parts[1])
         return WindowsPath(parts, l_drive, l_path)
     else
         WindowsPath(parts, "", "")
@@ -35,7 +40,7 @@ function WindowsPath(str::AbstractString)
 
         return WindowsPath(tuple(WIN_PATH_SEPARATOR, String.(tokenized[2:end])...), "", WIN_PATH_SEPARATOR)
     elseif contains(str, ":")
-        l_drive, l_path = splitdrive(str)
+        l_drive, l_path = _win_splitdrive(str)
 
         tokenized = split(l_path, WIN_PATH_SEPARATOR)
 
