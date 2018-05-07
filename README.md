@@ -95,20 +95,19 @@ homedir() | home()
 cd() | cd()
 joinpath() | joinpath()
 basename() | basename()
-N/A | filename
-N/A | extension
+splitext(basename())[1] | filename
+splitext(basename())[2] | extension
 N/A | extensions
 ispath | exists
 realpath | real
 normpath | norm
 abspath | abs
 relpath | relative
-N/A | glob
 stat | stat
 lstat | lstat
 filemode | mode
-N/A | modified
-N/A | created
+mtime | modified
+ctime | created
 isdir | isdir
 isfile | isfile
 islink | islink
@@ -117,11 +116,11 @@ isfifo | isfifo
 ischardev | ischardev
 isblockdev | isblockdev
 isexecutable (deprecated) | isexecutable
-iswritable (deprecated) | iswritabe
+iswritable (deprecated) | iswritable
 isreadable (deprecated) | isreadable
 ismount | ismount
 isabspath | isabs
-N/A | drive
+splitdrive()[1] | drive
 N/A | root
 expanduser | expanduser
 mkdir | mkdir
@@ -135,8 +134,8 @@ tempname | tmpname
 tempdir | tmpdir 
 mktemp | mktmp 
 mktempdir | mktmpdir 
-chmod (non-recursive) | chmod (recursive unix-only)
-chown (PR) | chown (unix only)
+chmod | chmod (recursive unix-only)
+chown (unix only) | chown (unix only)
 N/A | read
 N/A | write
 
