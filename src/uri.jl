@@ -13,7 +13,7 @@ function URIParser.URI(p::AbstractPath)
     
     for i=2:length(p.parts)
         print(b, "/")
-        print(b, p.parts[i])
+        print(b, URIParser.escape(p.parts[i]))
     end
     
     return URIParser.URI(String(take!(b)))
