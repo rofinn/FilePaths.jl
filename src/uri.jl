@@ -1,6 +1,6 @@
 function URIParser.URI(p::AbstractPath)
     if isempty(root(p))
-        error("$p is not an absolute path")
+        throw(ArgumentError("$p is not an absolute path"))
     end
 
     b = IOBuffer()
