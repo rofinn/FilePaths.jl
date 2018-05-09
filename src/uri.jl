@@ -8,13 +8,13 @@ function URIParser.URI(p::AbstractPath)
 
     if !isempty(drive(p))
         print(b, "/")
-        print(b, drive(p))        
+        print(b, drive(p))
     end
-    
+
     for i=2:length(p.parts)
         print(b, "/")
         print(b, URIParser.escape(p.parts[i]))
     end
-    
+
     return URIParser.URI(String(take!(b)))
 end
