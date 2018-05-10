@@ -1,7 +1,7 @@
-# FIlePaths.jl
+# FilePaths.jl
 
 [![Build Status](https://travis-ci.org/rofinn/FilePaths.jl.svg?branch=master)](https://travis-ci.org/rofinn/FilePaths.jl)
-[![codecov.io](https://codecov.io/github/rofinn/FilePaths.jl/coverage.svg?branch=master)](https://codecov.io/rofinn/Rory-Finnegan/FilePaths.jl?branch=master)
+[![codecov](https://codecov.io/gh/rofinn/FilePaths.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/rofinn/FilePaths.jl)
 
 FilePaths.jl provides a type based approach to working with filesystem paths in julia.
 
