@@ -1,4 +1,4 @@
-function URIParser.URI(p::AbstractPath)
+function URIParser.URI(p::AbstractPath; query="", fragment="")
     if isempty(root(p))
         throw(ArgumentError("$p is not an absolute path"))
     end
@@ -16,5 +16,5 @@ function URIParser.URI(p::AbstractPath)
         print(b, URIParser.escape(p.parts[i]))
     end
 
-    return URIParser.URI(String(take!(b)))
+    return URIParser.URI(URIParser.URI(String(take!(b))); query=query, fragment=fragment)
 end
