@@ -1,5 +1,5 @@
 using FilePaths
-using Base.Test
+using Test
 
 @testset "FilePaths" begin
 
