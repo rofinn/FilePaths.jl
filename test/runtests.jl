@@ -1,5 +1,6 @@
 using FilePaths
-using Base.Test
+using Compat
+using Compat.Test
 
 @testset "FilePaths" begin
 
