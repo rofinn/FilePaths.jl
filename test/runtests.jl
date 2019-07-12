@@ -1,9 +1,9 @@
 using FilePaths
-using Compat
-using Compat.Test
+using Test
 
 @testset "FilePaths" begin
 
 include("test_uri.jl")
+include("compat.jl")
 
 end
