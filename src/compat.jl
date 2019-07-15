@@ -1,5 +1,6 @@
 macro compat(ex)
-    new_ex = compat_exp(deepcopy(ex))
+    mod = @__MODULE__
+    new_ex = compat_exp(mod, deepcopy(ex))
 
     return quote
         $ex
@@ -7,7 +8,7 @@ macro compat(ex)
     end |> esc
 end
 
-function compat_exp(ex::Expr)
+function compat_exp(mod::Module, ex::Expr)
     fdef = splitdef(ex)
     args = Symbol[]
     kwargs = Expr[]
@@ -20,7 +21,7 @@ function compat_exp(ex::Expr)
         for (i, p) in enumerate(fdef[:whereparams])
             # If the param is a subtype of AbstracPath
             # then we store the lookup symbol in the params array
-            if _ispath(p.args[2])
+            if _ispath(mod, p.args[2])
                 p.args[2] = :(Union{AbstractString, $(p.args[2])})
                 push!(params, p.args[1])
             end
@@ -35,7 +36,7 @@ function compat_exp(ex::Expr)
                     T = a.args[1]
                     if T.args[2] in params
                         push!(convert_vars, T.args[1])
-                    elseif _ispath(T.args[2])
+                    elseif _ispath(mod, T.args[2])
                         T.args[2] = :(Union{AbstractString, $(T.args[2])})
                         push!(convert_vars, T.args[1])
                     end
@@ -44,7 +45,7 @@ function compat_exp(ex::Expr)
                 else
                     if a.args[2] in params
                         push!(convert_vars, a.args[1])
-                    elseif _ispath(a.args[2])
+                    elseif _ispath(mod, a.args[2])
                         a.args[2] = :(Union{AbstractString, $(a.args[2])})
                         push!(convert_vars, a.args[1])
                     end
@@ -64,7 +65,7 @@ function compat_exp(ex::Expr)
             T = k.args[1]
             if T.args[2] in params
                 push!(convert_vars, T.args[1])
-            elseif _ispath(T.args[2])
+            elseif _ispath(mod, T.args[2])
                 T.args[2] = :(Union{AbstractString, $(T.args[2])})
                 push!(convert_vars, T.args[1])
             end
@@ -80,7 +81,7 @@ function compat_exp(ex::Expr)
 
     push!(body, :(result = $(fdef[:name])($(args...); $(kwargs...))))
 
-    if haskey(fdef, :rtype) && (fdef[:rtype] in params || _ispath(fdef[:rtype]))
+    if haskey(fdef, :rtype) && (fdef[:rtype] in params || _ispath(mod, fdef[:rtype]))
         push!(body, :(result = string(result)))
         # push!(body, :(println(typeof(result))))
         fdef[:rtype] = :String
@@ -93,7 +94,7 @@ function compat_exp(ex::Expr)
     return MacroTools.combinedef(fdef)
 end
 
-function _ispath(t::Symbol)
-    T = eval(t)
+function _ispath(mod::Module, t::Symbol)
+    T = getfield(mod, t)
     return T <: AbstractPath
 end
