@@ -37,7 +37,18 @@ end
 # Test for inline definitions
 FilePaths.@compat inline(x::AbstractPath, y::AbstractPath) = relative(x, y)
 
+
+# Test for custom path type
+struct MyPath <: AbstractPath
+    x::String
 end
+
+__init__() = FilePathsBase.register(MyPath)
+FilePathsBase.ispathtype(::Type{MyPath}, str::AbstractString) = startswith(str, "mypath://")
+
+FilePaths.@compat mypath_testem(path::MyPath) = "**"*path.x
+
+end  # TestPkg module
 
 @testset "@compat" begin
     cd(abs(parent(Path(@__FILE__)))) do
@@ -116,6 +127,11 @@ end
 
             # Mixing strings and paths should also work here
             @test TestPkg.inline(string(p), home()) == relative(p, home())
+        end
+
+        @testset "Custom path type" begin
+            @test TestPkg.mypath_testem(TestPkg.MyPath("mypath://foo")) == "**mypath://foo"
+            @test TestPkg.mypath_testem("mypath://foo") == "**mypath://foo"
         end
     end
 end

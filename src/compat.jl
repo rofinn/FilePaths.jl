@@ -39,7 +39,7 @@ julia> myjoin("/Users/rory/repos", "FilePaths.jl")
 ```
 """
 macro compat(ex)
-    mod = @__MODULE__
+    mod::Module = QuoteNode(__module__).value
     new_ex = compat_exp(mod, deepcopy(ex))
 
     return quote
