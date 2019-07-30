@@ -10,7 +10,7 @@ Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 URIParser = "30578b45-9adc-5946-b283-645ec420af67"
 
 [compat]
-FilePathsBase = "0.5"
+FilePathsBase = "0.6"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
