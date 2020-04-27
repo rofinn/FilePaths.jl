@@ -2,10 +2,12 @@ __precompile__()
 
 module FilePaths
 
-using Reexport, URIParser, MacroTools
+using Glob, MacroTools, Reexport, URIParser
+using Glob: GlobMatch
 @reexport using FilePathsBase
 
-include("uri.jl")
 include("compat.jl")
+include("glob.jl")
+include("uri.jl")
 
 end # end of module

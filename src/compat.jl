@@ -13,7 +13,7 @@ Wrapper method properties:
 # Examples
 
 ```
-julia> using FilePaths
+julia> using FilePathsBase; using FilePathsBase: /; using FilePaths
 
 julia> FilePaths.@compat function myrelative(x::AbstractPath, y::AbstractPath)
            return relative(x, y)
