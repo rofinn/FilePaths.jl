@@ -3,7 +3,8 @@ using Test
 
 @testset "FilePaths" begin
 
-include("test_uri.jl")
 include("compat.jl")
+include("glob.jl")
+include("test_uri.jl")
 
 end

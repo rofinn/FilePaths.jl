@@ -1,5 +1,7 @@
 module TestPkg
 
+using FilePathsBase
+using FilePathsBase: /
 using FilePaths
 
 # Test for basic definitions taking abstract paths
@@ -44,14 +46,16 @@ struct MyPath <: AbstractPath
 end
 
 __init__() = FilePathsBase.register(MyPath)
-FilePathsBase.ispathtype(::Type{MyPath}, str::AbstractString) = startswith(str, "mypath://")
+function Base.tryparse(::Type{MyPath}, str::AbstractString)
+    startswith(str, "mypath://") ? MyPath(str) : nothing
+end
 
 FilePaths.@compat mypath_testem(path::MyPath) = "**"*path.x
 
 end  # TestPkg module
 
 @testset "@compat" begin
-    cd(abs(parent(Path(@__FILE__)))) do
+    cd(absolute(parent(Path(@__FILE__)))) do
         reg = Sys.iswindows() ? "..\\src\\FilePaths.jl" : "../src/FilePaths.jl"
         @test ispath(reg)
         p = Path(reg)

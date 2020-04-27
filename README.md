@@ -3,143 +3,60 @@
 [![Build Status](https://travis-ci.org/rofinn/FilePaths.jl.svg?branch=master)](https://travis-ci.org/rofinn/FilePaths.jl)
 [![codecov](https://codecov.io/gh/rofinn/FilePaths.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/rofinn/FilePaths.jl)
 
-FilePaths.jl provides a type based approach to working with filesystem paths in julia.
+[FilePathsBase.jl](https://github.com/rofinn/FilePathsBase.jl) provides a type based API for working with filesystem paths.
+Please review the FilePathsBase [docs](https://rofinn.github.io/FilePathsBase.jl/stable/) for more info on working with the base filepath types.
+FilePaths.jl extends FilePathsBase to provide easier interoperability with the rest of the Julia ecosystem.
 
 ## Intallation:
 FilePaths.jl is registered, so you can to use `Pkg.add` to install it.
+
 ```julia
 julia> Pkg.add("FilePaths")
 ```
 
 ## Usage:
 ```julia
-julia> using FilePaths
+julia> using FilePaths; using FilePathsBase: /
 ```
 
-The first important difference about working with paths in FilePaths.jl is that a path is an immutable list (Tuple) of strings, rather than simple a string.
-
-Path creation:
+Globbing files:
 ```julia
-julia> Path("~/repos/FilePaths.jl/")
-Paths.PosixPath(("~","repos","FilePaths.jl",""))
+julia> using Glob
+
+julia> glob("*test*.jl", p"test")
+2-element Array{PosixPath,1}:
+ p"test/runtests.jl"
+ p"test/test_uri.jl"
 ```
-or
+
+URIParsing:
 ```julia
-julia> p"~/repos/FilePaths.jl/"
-Paths.PosixPath(("~","repos","FilePaths.jl",""))
+julia> URI(cwd() / p"test/runtests.jl")
+URI(file:///Users/rory/repos/FilePaths.jl/test/runtests.jl)
 ```
 
-Human readable file status info:
+Writing `String` and `AbstractPath` compatible code:
+
 ```julia
-julia> stat(p"README.md")
-Status(
-  device = 16777220,
-  inode = 48428965,
-  mode = -rw-r--r--,
-  nlink = 1,
-  uid = 501,
-  gid = 20,
-  rdev = 0,
-  size = 1880 (1.8K),
-  blksize = 4096 (4.0K),
-  blocks = 8,
-  mtime = 2016-02-16T00:49:27,
-  ctime = 2016-02-16T00:49:27,
-)
+julia> FilePaths.@compat function myrelative(x::AbstractPath, y::AbstractPath)
+           return relative(x, y)
+       end
+myrelative (generic function with 2 methods)
+
+julia> FilePaths.@compat function myjoin(x::P, y::String)::P where P <: AbstractPath
+           return x / y
+       end
+myjoin (generic function with 2 methods)
+
+julia> myrelative(cwd(), home())
+p"repos/FilePaths.jl"
+
+julia> myrelative(pwd(), homedir())
+p"repos/FilePaths.jl"
+
+julia> myjoin(parent(cwd()), "FilePaths.jl")
+p"/Users/rory/repos/FilePaths.jl"
+
+julia> myjoin("/Users/rory/repos", "FilePaths.jl")
+"/Users/rory/repos/FilePaths.jl"
 ```
-
-Working with permissions:
-```julia
-julia> m = mode(p"README.md")
--rw-r--r--
-
-julia> m - readable(:ALL)
---w-------
-
-julia> m + executable(:ALL)
--rwxr-xr-x
-
-julia> chmod(p"README.md", "+x")
-
-julia> mode(p"README.md")
--rwxr-xr-x
-
-julia> chmod(p"README.md", m)
-
-julia> m = mode(p"README.md")
--rw-r--r--
-
-julia> chmod(p"README.md", user=(READ+WRITE+EXEC), group=(READ+WRITE), other=READ)
-
-julia> mode(p"README.md")
--rwxrw-r--
-
-```
-
-
-Reading and writing directly to file paths:
-```julia
-julia> write(p"testfile", "foobar")
-6
-
-julia> read(p"testfile")
-"foobar"
-```
-
-All the standard methods for working with paths in base julia exist in the FilePaths.jl. The following describes the rough mapping of method names. Use `?` at the REPL to get the documentation and arguments as they may be different than the base implementations.
-
-Base | FilePaths.jl
---- | ---
-pwd() | cwd()
-homedir() | home()
-cd() | cd()
-joinpath() | joinpath()
-basename() | basename()
-splitext(basename())[1] | filename
-splitext(basename())[2] | extension
-N/A | extensions
-ispath | exists
-realpath | real
-normpath | norm
-abspath | abs
-relpath | relative
-stat | stat
-lstat | lstat
-filemode | mode
-mtime | modified
-ctime | created
-isdir | isdir
-isfile | isfile
-islink | islink
-issocket | issocket
-isfifo | isfifo
-ischardev | ischardev
-isblockdev | isblockdev
-isexecutable (deprecated) | isexecutable
-iswritable (deprecated) | iswritable
-isreadable (deprecated) | isreadable
-ismount | ismount
-isabspath | isabs
-splitdrive()[1] | drive
-N/A | root
-expanduser | expanduser
-mkdir | mkdir
-mkpath | N/A (use mkdir)
-symlink | symlink
-cp | copy
-mv | move
-rm | remove
-touch | touch
-tempname | tmpname
-tempdir | tmpdir 
-mktemp | mktmp 
-mktempdir | mktmpdir 
-chmod | chmod (recursive unix-only)
-chown (unix only) | chown (unix only)
-N/A | read
-N/A | write
-
-## TODO:
-* cross platform chmod and chown
-
-
