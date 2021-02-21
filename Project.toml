@@ -5,21 +5,23 @@ version = "0.8.2"
 
 [deps]
 FilePathsBase = "48062228-2e41-5def-b9a4-89aafe57970f"
-Glob = "c27321d9-0574-5035-807b-f59d2c89b15c"
 MacroTools = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
 Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
-URIParser = "30578b45-9adc-5946-b283-645ec420af67"
+Requires = "ae029012-a4dd-5104-9daa-d747884805df"
 
 [compat]
 FilePathsBase = "0.9"
 Glob = "1"
 MacroTools = "0.5"
 Reexport = "0.2, 1.0"
+Requires = "1"
 URIParser = "0.4"
 julia = "1"
 
 [extras]
+Glob = "c27321d9-0574-5035-807b-f59d2c89b15c"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+URIParser = "30578b45-9adc-5946-b283-645ec420af67"
 
 [targets]
-test = ["Test"]
+test = ["Glob", "Test", "URIParser"]

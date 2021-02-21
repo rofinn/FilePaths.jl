@@ -1,3 +1,5 @@
+using .URIParser
+
 function URIParser.URI(p::AbstractPath; query="", fragment="")
     if isempty(p.root)
         throw(ArgumentError("$p is not an absolute path"))
