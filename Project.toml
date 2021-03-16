@@ -1,7 +1,7 @@
 name = "FilePaths"
 uuid = "8fc22ac5-c921-52a6-82fd-178b2807b824"
 authors = ["Rory Finnegan"]
-version = "0.8.1"
+version = "0.8.2"
 
 [deps]
 FilePathsBase = "48062228-2e41-5def-b9a4-89aafe57970f"
@@ -14,7 +14,7 @@ URIParser = "30578b45-9adc-5946-b283-645ec420af67"
 FilePathsBase = "0.9"
 Glob = "1"
 MacroTools = "0.5"
-Reexport = "0.2"
+Reexport = "0.2, 1.0"
 URIParser = "0.4"
 julia = "1"
 
