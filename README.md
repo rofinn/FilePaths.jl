@@ -1,7 +1,7 @@
 # FilePaths.jl
 
-[![Build Status](https://travis-ci.org/rofinn/FilePaths.jl.svg?branch=master)](https://travis-ci.org/rofinn/FilePaths.jl)
-[![codecov](https://codecov.io/gh/rofinn/FilePaths.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/rofinn/FilePaths.jl)
+[![Build Status](https://github.com/rofinn/FilePaths.jl/workflows/CI/badge.svg)](https://github.com/rofinn/FilePaths.jl/actions)
+[![codecov.io](https://codecov.io/github/rofinn/FilePaths.jl/coverage.svg?branch=master)](https://codecov.io/rofinn/FilePaths.jl?branch=master)
 
 [FilePathsBase.jl](https://github.com/rofinn/FilePathsBase.jl) provides a type based API for working with filesystem paths.
 Please review the FilePathsBase [docs](https://rofinn.github.io/FilePathsBase.jl/stable/) for more info on working with the base filepath types.
