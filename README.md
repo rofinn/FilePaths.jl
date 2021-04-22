@@ -31,8 +31,10 @@ julia> glob("*test*.jl", p"test")
 
 URIParsing:
 ```julia
+julia> using URIs
+
 julia> URI(cwd() / p"test/runtests.jl")
-URI(file:///Users/rory/repos/FilePaths.jl/test/runtests.jl)
+URI("file:///Users/rory/repos/FilePaths.jl/test/runtests.jl")
 ```
 
 Writing `String` and `AbstractPath` compatible code:

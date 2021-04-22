@@ -1,4 +1,4 @@
-using URIParser
+using URIs
 using FilePaths
 
 @testset "URI" begin
