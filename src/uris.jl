@@ -1,6 +1,8 @@
-using .URIParser
+using .URIs
 
-function URIParser.URI(p::AbstractPath; query="", fragment="")
+const absent = SubString("absent", 1, 0)
+
+function URIs.URI(p::AbstractPath; query=absent, fragment=absent)
     if isempty(p.root)
         throw(ArgumentError("$p is not an absolute path"))
     end
@@ -15,8 +17,8 @@ function URIParser.URI(p::AbstractPath; query="", fragment="")
 
     for s in p.segments
         print(b, "/")
-        print(b, URIParser.escape(s))
+        print(b, URIs.escapeuri(s))
     end
 
-    return URIParser.URI(URIParser.URI(String(take!(b))); query=query, fragment=fragment)
+    return URIs.URI(URIs.URI(String(take!(b))); query=query, fragment=fragment)
 end
