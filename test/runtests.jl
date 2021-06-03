@@ -6,5 +6,6 @@ using Test
 include("compat.jl")
 include("glob.jl")
 include("test_uri.jl")
+include("fileio.jl")
 
 end
