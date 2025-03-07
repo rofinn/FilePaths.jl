@@ -4,7 +4,6 @@ using URIParser
 using FilePaths
 
 function URIParser.URI(p::AbstractPath; query="", fragment="")
-    Base.depwarn("`URIParser` is deprecated, use `URIs` instead.", :URIParser)
     if isempty(p.root)
         throw(ArgumentError("$p is not an absolute path"))
     end
