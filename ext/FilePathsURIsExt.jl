@@ -1,4 +1,7 @@
-using .URIs
+module FilePathsURIsExt
+
+using URIs
+using FilePaths
 
 const absent = SubString("absent", 1, 0)
 
@@ -21,4 +24,6 @@ function URIs.URI(p::AbstractPath; query=absent, fragment=absent)
     end
 
     return URIs.URI(URIs.URI(String(take!(b))); query=query, fragment=fragment)
+end
+
 end

@@ -2,7 +2,7 @@ name: CI
 # Run on master, tags, or any pull request
 on:
   schedule:
-    - cron: '0 1 * * *'  # Daily at 1 AM UTC (7 PM CST)
+    - cron: "0 1 * * *" # Daily at 1 AM UTC (7 PM CST)
   push:
     branches: [master]
     tags: ["*"]
@@ -24,30 +24,21 @@ jobs:
         arch:
           - x64
         include:
-          # Add a 1.0 job just to make sure we still support it
+          # Add a 1.9 job just to make sure we still support it
           - os: ubuntu-latest
-            version: 1.0.5
+            version: 1.9
             arch: x64
           # Add a 32-bit job to ensure we don't have any 64-bit specific logic
           - os: ubuntu-latest
             version: 1
             arch: x86
     steps:
-      - uses: actions/checkout@v2
-      - uses: julia-actions/setup-julia@v1
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@latest
         with:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
-      - uses: actions/cache@v1
-        env:
-          cache-name: cache-artifacts
-        with:
-          path: ~/.julia/artifacts
-          key: ${{ runner.os }}-test-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-test-${{ env.cache-name }}-
-            ${{ runner.os }}-test-
-            ${{ runner.os }}-
+      - uses: julia-actions/cache@v2
       - uses: julia-actions/julia-buildpkg@latest
       - run: |
           git config --global user.name Tester
