@@ -1,4 +1,7 @@
-using .URIParser
+module FilePathsURIParserExt
+
+using URIParser
+using FilePaths
 
 function URIParser.URI(p::AbstractPath; query="", fragment="")
     Base.depwarn("`URIParser` is deprecated, use `URIs` instead.", :URIParser)
@@ -20,4 +23,6 @@ function URIParser.URI(p::AbstractPath; query="", fragment="")
     end
 
     return URIParser.URI(URIParser.URI(String(take!(b))); query=query, fragment=fragment)
+end
+
 end

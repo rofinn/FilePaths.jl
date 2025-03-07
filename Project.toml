@@ -1,23 +1,31 @@
 name = "FilePaths"
 uuid = "8fc22ac5-c921-52a6-82fd-178b2807b824"
 authors = ["Rory Finnegan"]
-version = "0.8.3"
+version = "0.9.0"
 
 [deps]
 FilePathsBase = "48062228-2e41-5def-b9a4-89aafe57970f"
 MacroTools = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
 Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
-Requires = "ae029012-a4dd-5104-9daa-d747884805df"
+
+[weakdeps]
+Glob = "c27321d9-0574-5035-807b-f59d2c89b15c"
+URIParser = "30578b45-9adc-5946-b283-645ec420af67"
+URIs = "5c2747f8-b7ea-4ff2-ba2e-563bfd36b1d4"
+
+[extensions]
+FilePathsGlobExt = "Glob"
+FilePathsURIParserExt = "URIParser"
+FilePathsURIsExt = "URIs"
 
 [compat]
 FilePathsBase = "0.9"
 Glob = "1"
 MacroTools = "0.5"
 Reexport = "0.2, 1.0"
-Requires = "1"
 URIParser = "0.4"
 URIs = "1.1"
-julia = "1"
+julia = "1.9"
 
 [extras]
 Glob = "c27321d9-0574-5035-807b-f59d2c89b15c"
